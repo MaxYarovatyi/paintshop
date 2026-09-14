@@ -1,0 +1,114 @@
+import { createClient } from "./server";
+import type { Painting, PaintingImage, PaintingStatus } from "../types/painting";
+
+interface PaintingRow{
+    id:string;
+    slug:string;
+    title:string;
+    description: string;
+    price_usd: number;
+    status: PaintingStatus;
+    width_cm: number;
+    height_cm: number;
+    medium: string;
+    year_created: number | null;
+    tags: string[];
+    is_featured: boolean;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
+    painting_images: PaintingImageRow[];
+}
+
+interface PaintingImageRow
+{
+    id:string;
+    painting_id: string;
+    storage_path: string;
+    alt_text: string;
+    sort_order: number;
+    is_primary: boolean;
+}
+
+function mapImage(row: PaintingImageRow): PaintingImage
+{
+    return {
+        id: row.id,
+        paintingId: row.painting_id,
+        storagePath: row.storage_path,
+        altText: row.alt_text,
+        sortOrder: row.sort_order,
+        isPrimary: row.is_primary
+    }
+}
+
+function mapPainting(row:PaintingRow): Painting
+{
+    return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    description: row.description,
+    priceUsd: row.price_usd,
+    status: row.status,
+    widthCm: row.width_cm,
+    heightCm: row.height_cm,
+    medium: row.medium,
+    yearCreated: row.year_created,
+    tags: row.tags,
+    isFeatured: row.is_featured,
+    sortOrder: row.sort_order,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    images: (row.painting_images ?? [])
+      .slice()
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map(mapImage),
+  };
+}
+
+
+export async function getPaintings(): Promise<Painting[]> {
+    const supabase = await createClient();
+    const {data, error} = await supabase
+        .from("paintings")
+        .select("*, painting_images(*)")
+        .order("sort_order", {ascending: true});
+
+    if(error) 
+    {
+        console.error("getPaintings error:", error.message)
+        return [];
+    }
+    return (data as PaintingRow[]).map(mapPainting);
+}
+
+export async function getFeaturedPaintings(): Promise<Painting[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("paintings")
+    .select("*, painting_images(*)")
+    .eq("is_featured", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error("getFeaturedPaintings error:", error.message);
+    return [];
+  }
+  return (data as PaintingRow[]).map(mapPainting);
+}
+
+export async function getPaintingBySlug(slug: string): Promise<Painting | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("paintings")
+    .select("*, painting_images(*)")
+    .eq("slug", slug)
+    .single();
+
+  if (error) {
+    console.error("getPaintingBySlug error:", error.message);
+    return null;
+  }
+  return mapPainting(data as PaintingRow);
+}

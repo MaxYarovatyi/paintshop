@@ -1,8 +1,8 @@
 import PaintingGrid from "@/components/gallery/PaintingGrid";
-import { mockPaintings } from "@/lib/mock/paintings";
+import { getFeaturedPaintings } from "@/lib/supabase/queries";
 
-export default function HomePage() {
-    const featured = mockPaintings.filter((p) => p.isFeatured);
+export default async function HomePage() {
+    const featured = await getFeaturedPaintings();
 
     return (
         <div className="py-16">
