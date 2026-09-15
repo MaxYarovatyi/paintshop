@@ -1,5 +1,20 @@
 import { createClient } from "./server";
 import type { Painting, PaintingImage, PaintingStatus } from "../types/painting";
+import { Inquiry } from "../types/inquiry";
+
+interface InquiryRow
+{
+  id: string;
+  painting_id: string;
+  buyer_name: string;
+  buyer_country: string;
+  buyer_contact: string;
+  message: string | null;
+  status: string;
+  provider: string;
+  created_at: string;
+  paintings: {title: string; slug: string}|null;
+}
 
 interface PaintingRow{
     id:string;
@@ -18,6 +33,36 @@ interface PaintingRow{
     created_at: string;
     updated_at: string;
     painting_images: PaintingImageRow[];
+}
+
+function mapInquiry(row: InquiryRow)
+{
+  return {
+    id: row.id,
+    paintingId: row.painting_id,
+    buyerName: row.buyer_name,
+    buyerContact: row.buyer_contact,
+    buyerCountry: row.buyer_country,
+    message: row.message,
+    status: row.status as Inquiry["status"],
+    provider: row.provider,
+    createdAt: row.created_at,
+    painting: row.paintings ?? undefined
+  }
+}
+
+export async function getInquiries(): Promise<Inquiry[]> {
+  const supabase = await createClient();
+  const {data, error} = await supabase
+    .from("inquiries")
+    .select("*, paintings(title, slug)")
+    .order("created_at", {ascending: false});
+
+    if(error) {
+      console.error("getInquiries error:", error.message);
+      return [];
+    }
+    return (data as InquiryRow[]).map(mapInquiry);
 }
 
 interface PaintingImageRow
@@ -108,6 +153,21 @@ export async function getPaintingBySlug(slug: string): Promise<Painting | null> 
 
   if (error) {
     console.error("getPaintingBySlug error:", error.message);
+    return null;
+  }
+  return mapPainting(data as PaintingRow);
+}
+
+export async function getPaintingById(id: string): Promise<Painting | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("paintings")
+    .select("*, painting_images(*)")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("getPaintingById error:", error.message);
     return null;
   }
   return mapPainting(data as PaintingRow);

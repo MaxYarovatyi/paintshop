@@ -25,7 +25,7 @@ export default async function PaintingDetailPage({params}: {params: Promise<{slu
 
         {painting.status === "available" && (
           <div className="mt-10">
-            <InquiryForm paintingTitle={painting.title} />
+            <InquiryForm paintingId={painting.id} paintingTitle={painting.title} paintingSlug={painting.slug}/>
           </div>
         )}
       </div>

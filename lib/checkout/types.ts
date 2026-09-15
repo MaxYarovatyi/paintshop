@@ -1,12 +1,19 @@
-interface OrderIntent {
+export interface OrderIntent {
     paintingId: string;
+    paintingTitle: string;
+    paintingSlug: string;
     buyerName: string;
     buyerContact: string;
     buyerCountry: string;
     message?: string;
 }
 
-interface CheckoutProvider
+export interface CheckoutResult {
+    redirectUrl: string;
+}
+
+export interface CheckoutProvider
 {
-    initiate(order: OrderIntent): Promise<{redirectUrl?: string;}>;
+    name: string;
+    initiate(order: OrderIntent): Promise<CheckoutResult>;
 }

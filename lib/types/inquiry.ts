@@ -10,4 +10,6 @@ export interface Inquiry
     message: string | null;
     status: InquiryStatus;
     createdAt: string; 
+    provider: string;
+    painting?: {title: string; slug: string};
 }

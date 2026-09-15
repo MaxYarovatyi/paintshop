@@ -9,7 +9,13 @@ const nextConfig: NextConfig = {
       hostname: supabaseHost,
       pathname: "/storage/v1/object/public/**"
     }]
-  }
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb"
+    }
+  },
+  allowedDevOrigins:["192.168.198.28"]
 };
 
 export default nextConfig;
