@@ -62,7 +62,7 @@ export default function ImageManager({ painting }: { painting: Painting }) {
       </div>
 
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFilesSelected} disabled={isPending} />
-      {isPending && <p className="text-sm text-neutral-500 mt-2">Uploading…</p>}
+      {isPending && <p className="text-sm text-ink-muted mt-2">Uploading…</p>}
     </div>
   );
 }

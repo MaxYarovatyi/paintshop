@@ -39,7 +39,7 @@ export default function PaintingCard({ painting }: { painting: Painting }) {
                         {formatPrice(painting.priceUsd)}
                     </span>
                 </div>
-                <p className="text-sm text-neutral-500">{painting.medium}</p>
+                <p className="text-sm text-ink-muted">{painting.medium}</p>
             </Link>
         </motion.div>
     );

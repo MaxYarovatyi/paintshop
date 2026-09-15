@@ -43,6 +43,7 @@ export async function updatePainting(id: string, formData: FormData) {
   revalidatePath(`/admin/paintings/${id}/edit`);
   revalidatePath("/gallery");
   revalidatePath("/");
+  redirect('/admin');
 }
 
 export async function deletePainting(id: string) {

@@ -16,7 +16,7 @@ export default function Nav() {
                 <Link
                     key={l.href}
                     href={l.href}
-                    className={pathname === l.href ? "text-accent" : "text-neutral-500 hover:text-neutral-900"}
+                    className={pathname === l.href ? "text-accent" : "text-ink-muted hover:text-ink"}
                 >
                     {l.label}
                 </Link>

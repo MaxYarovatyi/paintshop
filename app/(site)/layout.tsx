@@ -6,7 +6,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     return (
         <>
             <Header />
-            <main className="mx-auto max-w-content px-6 md:px-10">
+            <main>
                 <PageTransition>{children}</PageTransition>
             </main>
             <Footer />

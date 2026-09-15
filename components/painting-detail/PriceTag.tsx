@@ -10,7 +10,7 @@ export default function PriceTag({priceUsd,status}: {priceUsd: number; status: P
     return (
         <div className="flex items-center gap-3">
             <span className="text-xl text-neutral-400 line-through">{formatPrice(priceUsd)}</span>
-            <span className="text-sm uppercase tracking-wide text-neutral-500">{status}</span>
+            <span className="text-sm uppercase tracking-wide text-ink-muted">{status}</span>
         </div>
     )
 }

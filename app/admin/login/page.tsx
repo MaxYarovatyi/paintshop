@@ -8,7 +8,7 @@ export default async function LoginPage({
 }) {
   const { error } = await searchParams;
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+    <div className="min-h-screen flex items-center justify-center bg-canvas">
       <form action={signIn} className="w-full max-w-sm space-y-4 p-8">
         <h1 className="font-serif text-2xl mb-6">Admin login</h1>
         {error && <p className="text-sm text-red-600">{error}</p>}

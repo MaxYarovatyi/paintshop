@@ -3,12 +3,12 @@ import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 
 const sans = Inter({
-  variable: "--font-sans",
+  variable: "--font-sans-variable",
   subsets: ["latin", "cyrillic"],
 });
 
 const serif = Fraunces({
-  variable: "--font-serif",
+  variable: "--font-serif-variable",
   subsets: ["latin"],
 });
 
@@ -23,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${sans.variable} ${serif.variable} h-full antialiased`}
     >
-      <body className="bg-neutral-50 text-neutral-900 antialiased">{children}</body>
+      <body className="bg-canvas textink antialiased">{children}</body>
     </html>
   );
 }

@@ -12,7 +12,7 @@ export default async function InquiriesPage() {
       <h1 className="font-serif text-2xl mb-8">Inquiries</h1>
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-neutral-600 border-b border-neutral-200">
+          <tr className="text-left text-ink-muted border-b border-neutral-200">
             <th className="py-2">Painting</th>
             <th className="py-2">Buyer</th>
             <th className="py-2">Contact</th>
@@ -42,7 +42,7 @@ export default async function InquiriesPage() {
                   {inq.provider}
                 </span>
               </td>
-              <td className="py-3 text-neutral-600">
+              <td className="py-3 text-ink-muted">
                 {new Date(inq.createdAt).toLocaleDateString()}
               </td>
               <td className="py-3">
@@ -53,7 +53,7 @@ export default async function InquiriesPage() {
         </tbody>
       </table>
       {inquiries.length === 0 && (
-        <p className="text-neutral-500 py-10">No inquiries yet.</p>
+        <p className="text-ink-muted py-10">No inquiries yet.</p>
       )}
     </div>
     )

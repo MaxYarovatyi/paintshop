@@ -3,6 +3,7 @@ import { getPaintingBySlug } from "@/lib/supabase/queries";
 import ImageViewer from "@/components/painting-detail/ImageViewer";
 import PriceTag from "@/components/painting-detail/PriceTag";
 import InquiryForm from "@/components/painting-detail/InquiryForm";
+import PageContainer from "@/components/layout/PageContainer";
 
 export default async function PaintingDetailPage({params}: {params: Promise<{slug: string}>})
 {
@@ -11,12 +12,12 @@ export default async function PaintingDetailPage({params}: {params: Promise<{slu
     if(!painting) notFound();
 
     return(
-        <div className="py-16 grid grid-cols-1 md:grid-cols-2 gap-12">
+      <PageContainer className="py-16 grid grid-cols-1 md:grid-cols-2 gap-12">
       <ImageViewer images={painting.images} title={painting.title} />
 
       <div>
         <h1 className="font-serif text-3xl mb-2">{painting.title}</h1>
-        <p className="text-neutral-500 mb-4">
+        <p className="text-ink-muted mb-4">
           {painting.medium} · {painting.widthCm}×{painting.heightCm} cm
           {painting.yearCreated ? ` · ${painting.yearCreated}` : ""}
         </p>
@@ -29,6 +30,6 @@ export default async function PaintingDetailPage({params}: {params: Promise<{slu
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
     )
 }

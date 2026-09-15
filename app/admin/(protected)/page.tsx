@@ -12,7 +12,7 @@ export default async function AdminPaintingsPage() {
       <h1 className="font-serif text-2xl mb-8">Paintings</h1>
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-neutral-500 border-b border-neutral-200">
+          <tr className="text-left text-ink-muted border-b border-neutral-200">
             <th className="py-2">Title</th>
             <th className="py-2">Status</th>
             <th className="py-2">Price</th>
