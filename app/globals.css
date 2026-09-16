@@ -1,3 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+    --color-canvas: #faf8f3;
+    --color-canvas-muted: #f1ebe0;
+    --color-canvas-border: #e4dbc9;
+    --color-ink: #211f1c;
+    --color-ink-muted: #6f6a5f;
+    --color-accent: #000000;
 
+    --font-sans: var(--font-sans-variable);
+    --font-serif: var(--font-serif-variable);
+
+    --max-width-content: 1400px;
+}

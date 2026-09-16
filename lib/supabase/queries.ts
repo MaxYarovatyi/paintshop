@@ -113,12 +113,21 @@ function mapPainting(row:PaintingRow): Painting
 }
 
 
-export async function getPaintings(): Promise<Painting[]> {
+export async function getPaintings(filters?: {tag?: string; availableOnly?:boolean}): Promise<Painting[]> {
     const supabase = await createClient();
-    const {data, error} = await supabase
-        .from("paintings")
+    let query = supabase
+      .from("paintings")
         .select("*, painting_images(*)")
         .order("sort_order", {ascending: true});
+    
+    if(filters?.tag) {
+      query = query.contains("tags", [filters.tag])
+    }
+    if(filters?.availableOnly) {
+      query = query.eq("status", "available");
+    }
+
+    const {data, error} = await query;
 
     if(error) 
     {
@@ -171,4 +180,17 @@ export async function getPaintingById(id: string): Promise<Painting | null> {
     return null;
   }
   return mapPainting(data as PaintingRow);
+}
+
+export async function getAllTags(): Promise<string[]> {
+  const supabase = await createClient();
+  const {data, error} = await supabase.from("paintings").select("tags");
+
+  if(error) {
+    console.error("getAllTags error:", error.message);
+    return [];
+  }
+
+  const allTags = (data as {tags: string[]}[]).flatMap((row)=> row.tags);
+  return Array.from(new Set(allTags)).sort();
 }

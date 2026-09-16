@@ -5,14 +5,19 @@ import PageContainer from "@/components/layout/PageContainer";
 import Section from "@/components/layout/Section";
 import { getFeaturedPaintings } from "@/lib/supabase/queries";
 
+export const metadata = {
+  title: "Gallery — Original Abstract & Postmodernist Paintings",
+  description: "Original abstract and postmodernist paintings, shipping worldwide from Ukraine. Each piece is a unique original.",
+};
+
 export default async function HomePage() {
     const featured = await getFeaturedPaintings();
 
     return (
         <>
         <PageContainer className="py-16 md:py-24">
-            <section className="max-w-2xl mb-16">
-                <h1 className="font-serif text-4xl md:text-5x1 leading-tight mb-4 text-ink">
+            <section className="max-w-2xl mb-12 md:mb-16">
+                <h1 className="font-serif text-3xl md:text-5xl leading-tight mb-4 text-ink">
                     Original abstract and postmodernist paintings.
                 </h1>
                 <p className="text-ink-muted">

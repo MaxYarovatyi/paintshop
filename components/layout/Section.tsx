@@ -13,7 +13,7 @@ export default function Section({
     children: React.ReactNode
 }) {
     return (
-        <section className={muted ? "py-20 bg-canvas-muted": "py-20"}>
+        <section className={`py-12 md:py-20 ${muted ? "bg-canvas-muted": ""}`}>
             <PageContainer>
                 {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
                 {title && <h2 className="font-serif text-2s1 md:text-3xl mb-8 text-ink">{title}</h2>}

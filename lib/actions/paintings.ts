@@ -121,3 +121,36 @@ export async function setPrimaryImage(imageId: string, paintingId: string) {
   revalidatePath("/gallery");
   revalidatePath("/");
 }
+
+export async function moveImage(paintingId:string, imageId: string, direction: "up" | "down") {
+  const supabase = await createClient();
+  const {data: images, error} =await supabase
+    .from("painting_images")
+    .select("id, sort_order")
+    .eq("painting_id", paintingId)
+    .order("sort_order", {ascending: true});
+
+  if(error || !images) throw new Error(error?.message ?? "Could not load images");
+
+  const index = images.findIndex((img)=> img.id === imageId);
+  const targetIndex = direction === "up" ? index -1 : index+1;
+  if(index === -1 || targetIndex< 0 || targetIndex >= images.length) return;
+
+  const current = images[index];
+  const target = images[targetIndex];
+
+  await supabase.from("painting_images").update({sort_order: target.sort_order}).eq("id",current.id);
+  await supabase.from("painting_images").update({sort_order: current.sort_order}).eq("id", target.id);
+
+  revalidatePath(`/admin/paintings/${paintingId}/edit`);
+  revalidatePath("/gallery");
+  revalidatePath("/");
+}
+
+export async function updateImageAltText(imageId:string, paintingId: string, altText: string) {
+  const supabase = await createClient();
+  const {error} = await supabase.from("painting_images").update({alt_text:altText}).eq("id", imageId);
+  if(error) throw new Error(error.message);
+
+  revalidatePath(`/admin/paintings/${paintingId}/edit`);
+}

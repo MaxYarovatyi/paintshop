@@ -1,31 +1,43 @@
 "use client";
-import {motion, AnimatePresence} from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import type { PaintingImage } from "@/lib/types/painting";
 import { useState } from "react";
 import { getPaintingImageUrl } from "@/lib/utils/imageUrl";
+import Lightbox from "./Lightbox";
 
-export default function ImageViewer({images, title}: {images: PaintingImage[]; title: string})
-{
-    const sorted = [...images].sort((a,b)=> a.sortOrder-b.sortOrder);
-    const [activeIndex, setActiveIndex] = useState(
-        Math.max(sorted.findIndex((i)=> i.isPrimary), 0)
-    );
-    const active = sorted[activeIndex];
+export default function ImageViewer({
+  images,
+  title,
+}: {
+  images: PaintingImage[];
+  title: string;
+}) {
+  const sorted = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
+  const [activeIndex, setActiveIndex] = useState(
+    Math.max(
+      sorted.findIndex((i) => i.isPrimary),
+      0,
+    ),
+  );
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const active = sorted[activeIndex];
 
-    if(!active)
-    {
-        return (
-      <div className="aspect-[4/5] w-full bg-neutral-200 flex items-center justify-center text-neutral-400">
+  if (!active) {
+    return (
+      <div className="aspect-[4/5] w-full bg-canvas-muted flex items-center justify-center text-ink-muted">
         No image
       </div>
     );
-    }
-    const primary = images.find((i)=> i.isPrimary)??images[0];
+  }
 
-    return (
+  return (
     <div>
-      <div className="aspect-[4/5] w-full bg-neutral-200 relative overflow-hidden">
+      <button
+        onClick={() => setLightboxOpen(true)}
+        className="aspect-[4/5] w-full bg-canvas-muted relative overflow-hidden block cursor-zoom-in"
+        aria-label="Open full size image"
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={active.id}
@@ -45,15 +57,17 @@ export default function ImageViewer({images, title}: {images: PaintingImage[]; t
             />
           </motion.div>
         </AnimatePresence>
-      </div>
+      </button>
       {sorted.length > 1 && (
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           {sorted.map((img, i) => (
             <button
               key={img.id}
               onClick={() => setActiveIndex(i)}
               className={`relative w-16 aspect-[4/5] overflow-hidden border ${
-                i === activeIndex ? "border-neutral-900" : "border-transparent opacity-70"
+                i === activeIndex
+                  ? "border-ink"
+                  : "border-transparent opacity-70"
               }`}
             >
               <Image
@@ -67,6 +81,15 @@ export default function ImageViewer({images, title}: {images: PaintingImage[]; t
           ))}
         </div>
       )}
+
+      {lightboxOpen && (
+        <Lightbox
+          images={sorted}
+          initialIndex={activeIndex}
+          title={title}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
-    )
+  );
 }
