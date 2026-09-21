@@ -36,7 +36,7 @@ export default function Nav() {
         </button>
 
         {open && (
-            <div className="absolute top-full left-0 right-0 sm:hidden bg-canvas border-b border-canvas-border">
+            <div className="absolute top-full left-0 right-0 sm:hidden bg-canvas border-b border-canvas-border z-50">
           <nav className="flex flex-col px-6 py-4 gap-4 text-sm">
             {links.map((l) => (
               <Link

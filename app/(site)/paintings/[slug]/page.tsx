@@ -6,6 +6,9 @@ import PriceTag from "@/components/painting-detail/PriceTag";
 import InquiryForm from "@/components/painting-detail/InquiryForm";
 import PageContainer from "@/components/layout/PageContainer";
 import { getPaintingImageUrl } from "@/lib/utils/imageUrl";
+import DetailsGrid from "@/components/painting-detail/DetailsGrid";
+import ShareButtons from "@/components/painting-detail/ShareButtons";
+import { SITE_URL } from "@/lib/site";
 
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}): Promise<Metadata> {
   const {slug} = await params;
@@ -54,21 +57,27 @@ const jsonLd = {
   return (
     <PageContainer className="py-12 md:py-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-        <ImageViewer images={painting.images} title={painting.title} />
+      <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-8 md:gap-16">
+        <ImageViewer images={painting.images} title={painting.title} widthCm={painting.widthCm} heightCm={painting.heightCm}/>
 
         <div>
-          <h1 className="font-serif text-2xl mb-2 text-ink">
+          <h1 className="font-serif text-3xl md:text-4xl mb-6 text-ink">
             {painting.title}
           </h1>
-          <p className="text-ink-muted mb-4">
-            {painting.medium} · {painting.widthCm}×{painting.heightCm} cm
-            {painting.yearCreated ? ` · ${painting.yearCreated}` : ""}
-          </p>
-          <PriceTag priceUsd={painting.priceUsd} status={painting.status} />
-          <p className="mt-6 text-neutral-700 leading-relaxed">
+
+          <PriceTag priceUsd={painting.priceUsd} status = {painting.status} />
+
+          <DetailsGrid
+            medium={painting.medium}
+            widthCm={painting.widthCm}
+            heightCm={painting.heightCm}
+            yearCreated={painting.yearCreated}
+          />
+          <p className="text-ink leading-relaxed text-base md:text-lg my-6">
             {painting.description}
           </p>
+
+          <ShareButtons url={`${SITE_URL}/paintings/${painting.slug}`} title={painting.title} />
 
           {painting.status === "available" && (
             <div className="mt-10">

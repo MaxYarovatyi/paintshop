@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getPaintings } from "@/lib/supabase/queries";
+import { SITE_URL } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = "http://paintshop-seven.vercel.app"; //swap once custom domain is set;
+    const baseUrl = SITE_URL;
     const paintings = await getPaintings();
 
     const staticPages = ["", "/gallery", "/about", "/contact"].map((path)=> ({

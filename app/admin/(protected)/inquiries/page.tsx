@@ -3,12 +3,11 @@ import { getInquiries } from "@/lib/supabase/queries";
 import { updateInquiryStatus } from "@/lib/actions/inquiries";
 import InquiryStatusSelect from "@/components/admin/InquiryStatusSelect";
 
-
 export default async function InquiriesPage() {
-    const inquiries = await getInquiries();
+  const inquiries = await getInquiries();
 
-    return(
-         <div>
+  return (
+    <div>
       <h1 className="font-serif text-2xl mb-8">Inquiries</h1>
       <table className="w-full text-sm">
         <thead>
@@ -27,7 +26,10 @@ export default async function InquiriesPage() {
             <tr key={inq.id} className="border-b border-neutral-100 align-top">
               <td className="py-3">
                 {inq.painting ? (
-                  <Link href={`/admin/paintings/${inq.paintingId}/edit`} className="underline">
+                  <Link
+                    href={`/admin/paintings/${inq.paintingId}/edit`}
+                    className="underline"
+                  >
                     {inq.painting.title}
                   </Link>
                 ) : (
@@ -39,7 +41,7 @@ export default async function InquiriesPage() {
               <td className="py-3">{inq.buyerCountry}</td>
               <td className="py-3">
                 <span className="text-xs uppercase tracking-wide bg-neutral-200 px-2 py-1">
-                  {inq.provider}
+                  {inq.preferredChannel}
                 </span>
               </td>
               <td className="py-3 text-ink-muted">
@@ -56,5 +58,5 @@ export default async function InquiriesPage() {
         <p className="text-ink-muted py-10">No inquiries yet.</p>
       )}
     </div>
-    )
+  );
 }
