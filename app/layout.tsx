@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter, Fraunces, Newsreader, Instrument_Sans} from "next/font/google";
 import "./globals.css";
 import "flag-icons/css/flag-icons.min.css";
 
-const sans = Inter({
+const sans = Instrument_Sans({
   variable: "--font-sans-variable",
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin"],
 });
 
-const serif = Fraunces({
+const serif = Newsreader({
   variable: "--font-serif-variable",
   subsets: ["latin"],
 });
