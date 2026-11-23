@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { motion } from "motion/react";
+import { aspectRatio, motion } from "motion/react";
 import type { Painting } from "@/lib/types/painting";
 import { formatPrice } from "@/lib/utils/formatPrice";
 import { fadeUp } from "@/components/motion/variants";
@@ -16,10 +16,13 @@ export default function PaintingCard({
   const isAvailable = painting.status === "available";
   const primaryImage =
     painting.images.find((i) => i.isPrimary) ?? painting.images[0];
+  const rawRatio = painting.widthCm / painting.heightCm;
+  const ratio = Math.min(Math.max(rawRatio, 0.5), 2);
+
   return (
     <motion.div variants={fadeUp}>
       <Link href={`/paintings/${painting.slug}`} className="group block">
-        <div className="aspect-[4/5] w-full bg-neutral-200 overflow-hidden relative">
+        <div style={{aspectRatio: ratio}} className=" w-full bg-canvas-muted overflow-hidden relative">
           {primaryImage ? (
             <Image
               src={getPaintingImageUrl(primaryImage.storagePath)}

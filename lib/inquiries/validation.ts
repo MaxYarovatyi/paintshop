@@ -7,6 +7,8 @@ export const CHANNEL_CONTACT_TYPE: Record<string, ContactFieldType>= {
     telegram: "phone_or_username"
 };
 
+export type ContactMode = "phone" | "username";
+
 const PHONE_REGEX = /^\+[1-9]\d{7,14}$/;
 const USERNAME_REGEX = /^@?[a-zA-Z0-9_.]{2,30}$/;
 
@@ -30,9 +32,9 @@ export function validateContact(channel:string, value: string): boolean{
 
 export function contactPlaceholder(channel: string): string{
     const type = CHANNEL_CONTACT_TYPE[channel];
-    if(type === "phone") return "+380 XX XXX XX XX";
+    if(type === "phone") return "XX XXX XX XX";
     if(type === "username") return "@username";
-    return "+380 XX XXX XX XX or @username";
+    return "Number or @username";
 }
 
 export function contactErrorMessage(channel: string): string {
@@ -40,4 +42,12 @@ export function contactErrorMessage(channel: string): string {
     if(type === "phone") return "Enter a valid phone number";
     if (type === "username") return "Enter a valid Instagram username.";
     return "Enter a valid phone number or Telegram username.";
+}
+
+export function resolveContactMode(channel:string, value: string) : ContactMode
+{
+    const type = CHANNEL_CONTACT_TYPE[channel];
+    if(type === "phone") return "phone";
+    if(type === "username") return "username";
+    return /^@|[a-zA-Z]/.test(value.trim()) ? "username" : "phone";
 }

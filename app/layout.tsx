@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
+import "flag-icons/css/flag-icons.min.css";
 
 const sans = Inter({
   variable: "--font-sans-variable",

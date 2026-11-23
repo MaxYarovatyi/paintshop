@@ -16,10 +16,12 @@ export default function PaintingGrid({ paintings }: { paintings: Painting[] }) {
       initial="hidden"
       animate="visible"
       variants={staggerChildren}
-      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10"
+      className="columns-2 lg:columns-3 gap-5"
     >
       {paintings.map((p, i) => (
-        <PaintingCard key={p.id} painting={p} priority={i < 4} />
+        <div key={p.id} className="break-inside-avoid mb-8">
+          <PaintingCard key={p.id} painting={p} priority={i < 4} />
+        </div>
       ))}
     </motion.div>
   );

@@ -1,6 +1,7 @@
 import { createClient } from "./server";
 import type { Painting, PaintingImage, PaintingStatus } from "../types/painting";
 import { Inquiry } from "../types/inquiry";
+import type { Series, SeriesStatus } from "../types/series";
 
 interface InquiryRow {
   id: string;
@@ -32,6 +33,59 @@ interface PaintingRow {
   created_at: string;
   updated_at: string;
   painting_images: PaintingImageRow[];
+  series_id: string | null;
+}
+
+interface SeriesRow {
+  id: string;
+  slug: string;
+  title: string;
+  intro: string;
+  release_date: string | null;
+  status: SeriesStatus;
+  cover_image_path: string | null;
+  cover_image_alt: string;
+  created_at: string;
+  updated_at: string;
+}
+
+function mapSeries(row: SeriesRow): Series {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    intro: row.intro,
+    releaseDate: row.release_date,
+    status: row.status,
+    coverImagePath: row.cover_image_path,
+    coverImageAlt: row.cover_image_alt,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export async function getAllSeries(): Promise<Series[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("series")
+    .select("*")
+    .order("release_date", { ascending: false, nullsFirst: true });
+
+  if (error) {
+    console.error("getAllSeries error:", error.message);
+    return [];
+  }
+  return (data as SeriesRow[]).map(mapSeries);
+}
+
+export async function getSeriesById(id: string): Promise<Series | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("series").select("*").eq("id", id).single();
+  if (error) {
+    console.error("getSeriesById error:", error.message);
+    return null;
+  }
+  return mapSeries(data as SeriesRow);
 }
 
 function mapInquiry(row: InquiryRow) {
@@ -104,6 +158,7 @@ function mapPainting(row: PaintingRow): Painting {
       .slice()
       .sort((a, b) => a.sort_order - b.sort_order)
       .map(mapImage),
+    seriesId: row.series_id,
   };
 }
 

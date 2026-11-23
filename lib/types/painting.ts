@@ -18,6 +18,7 @@ export interface Painting
     createdAt: string;
     updatedAt: string;
     images: PaintingImage[];
+    seriesId: string | null;
 }
 
 export interface PaintingImage

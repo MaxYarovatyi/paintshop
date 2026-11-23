@@ -10,6 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex items-center gap-6 text-sm">
           <Link href="/admin/paintings/new">+ New painting</Link>
           <Link href="/admin/inquiries">Inquiries</Link>
+          <Link href="/admin/series">Series</Link>
           <form action={signOut}>
             <button type="submit" className="text-ink-muted">Log out</button>
           </form>

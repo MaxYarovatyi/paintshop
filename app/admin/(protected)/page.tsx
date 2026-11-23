@@ -1,11 +1,12 @@
 // app/admin/(protected)/page.tsx
 import Link from "next/link";
-import { getPaintings } from "@/lib/supabase/queries";
+import { getAllSeries, getPaintings } from "@/lib/supabase/queries";
 import { deletePainting } from "@/lib/actions/paintings";
 import { formatPrice } from "@/lib/utils/formatPrice";
 
 export default async function AdminPaintingsPage() {
-  const paintings = await getPaintings();
+  const [paintings, seriesList] = await Promise.all([getPaintings(), getAllSeries()]);
+const seriesTitle = new Map(seriesList.map((s) => [s.id, s.title]));
 
   return (
     <div>
@@ -17,6 +18,7 @@ export default async function AdminPaintingsPage() {
             <th className="py-2">Status</th>
             <th className="py-2">Price</th>
             <th className="py-2">Featured</th>
+            <th className="py-2">Series</th>
             <th className="py-2"></th>
           </tr>
         </thead>
@@ -27,6 +29,7 @@ export default async function AdminPaintingsPage() {
               <td className="py-3">{p.status}</td>
               <td className="py-3">{formatPrice(p.priceUsd)}</td>
               <td className="py-3">{p.isFeatured ? "Yes" : ""}</td>
+              <td className="py-3">{p.seriesId ? seriesTitle.get(p.seriesId) : ""}</td>
               <td className="py-3 flex gap-4">
                 <Link href={`/admin/paintings/${p.id}/edit`} className="underline">Edit</Link>
                 <form action={deletePainting.bind(null, p.id)}>

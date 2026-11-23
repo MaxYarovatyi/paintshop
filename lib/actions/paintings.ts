@@ -18,6 +18,7 @@ function parsePaintingFields(formData: FormData) {
     year_created: formData.get("yearCreated") ? Number(formData.get("yearCreated")) : null,
     tags: (formData.get("tags") as string).split(",").map((t) => t.trim()).filter(Boolean),
     is_featured: formData.get("isFeatured") === "on",
+    series_id: (formData.get("seriesId") as string) || null,
   };
 }
 

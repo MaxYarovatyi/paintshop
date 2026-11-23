@@ -39,7 +39,7 @@ export default function ImageViewer({
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-3">
+    <div className="flex flex-col md:flex-row md:items-start gap-3">
       {sorted.length > 1 && (
         <div className="flex md:flex-col gap-2 order-2 md:order-1">
           {sorted.map((img, i) => (
@@ -66,8 +66,8 @@ export default function ImageViewer({
 
       <button
         onClick={() => setLightboxOpen(true)}
-        style={{aspectRatio: ratio}}
-        className="order-1 md:order-2 flex-1 aspect-[4/5] bg-canvas-muted relative overflow-hidden block cursor-zoom-in"
+        style={{"--ratio": ratio} as React.CSSProperties}
+        className="painting-frame order-1 md:order-2 bg-canvas-muted relative overflow-hidden block cursor-zoom-in"
         aria-label="Open full size image"
       >
         <AnimatePresence mode="wait">
@@ -84,7 +84,7 @@ export default function ImageViewer({
               alt={active.altText || title}
               fill
               sizes="(max-width: 768px) 100vw, 60vw"
-              className="object-cover"
+              className="object-contain"
               priority
             />
           </motion.div>

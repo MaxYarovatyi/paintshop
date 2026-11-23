@@ -13,3 +13,14 @@
 
     --max-width-content: 1400px;
 }
+
+.painting-frame {
+    width: 100%;
+    aspect-ratio: var(--ratio);
+}
+
+@media (min-width: 768px) {
+    .painting-frame {
+        width: min(100%, calc(max(360px, 100vh - 11rem) * var(--ratio)));
+    }
+}
