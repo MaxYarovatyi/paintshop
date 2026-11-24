@@ -1,8 +1,8 @@
 import { createClient } from "./server";
 import type { Painting } from "../types/painting";
-import { mapPainting, type PaintingRow } from "./mappers";
+import { mapPainting, mapSeries, type PaintingRow, type SeriesRow } from "./mappers";
 import { Inquiry } from "../types/inquiry";
-import type { Series, SeriesStatus } from "../types/series";
+import type { Series } from "../types/series";
 
 interface InquiryRow {
   id: string;
@@ -15,34 +15,6 @@ interface InquiryRow {
   preferred_channel: string;
   created_at: string;
   products: { title: string; slug: string } | null;
-}
-
-interface SeriesRow {
-  id: string;
-  slug: string;
-  title: string;
-  intro: string;
-  release_date: string | null;
-  status: SeriesStatus;
-  cover_image_path: string | null;
-  cover_image_alt: string;
-  created_at: string;
-  updated_at: string;
-}
-
-function mapSeries(row: SeriesRow): Series {
-  return {
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    intro: row.intro,
-    releaseDate: row.release_date,
-    status: row.status,
-    coverImagePath: row.cover_image_path,
-    coverImageAlt: row.cover_image_alt,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
 }
 
 export async function getAllSeries(): Promise<Series[]> {

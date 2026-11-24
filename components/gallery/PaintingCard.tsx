@@ -6,6 +6,7 @@ import { formatPrice } from "@/lib/utils/formatPrice";
 import { fadeUp } from "@/components/motion/variants";
 import { getPaintingImageUrl } from "@/lib/utils/imageUrl";
 import Image from "next/image";
+import { paintingRatio } from "@/lib/utils/paintingDisplay";
 
 export default function PaintingCard({
   painting,
@@ -16,13 +17,7 @@ export default function PaintingCard({
 }) {
   const primaryImage =
     painting.images.find((i) => i.isPrimary) ?? painting.images[0];
-  // The photo's own ratio when known, so no empty bands appear around it.
-  // Older images without stored pixel size fall back to the canvas size.
-  const rawRatio =
-    primaryImage?.widthPx && primaryImage.heightPx
-      ? primaryImage.widthPx / primaryImage.heightPx
-      : painting.widthCm / painting.heightCm;
-  const ratio = Math.min(Math.max(rawRatio, 0.5), 2);
+  const ratio = paintingRatio(painting);
 
   return (
     <motion.div variants={fadeUp}>

@@ -23,7 +23,10 @@ export default function ContactPage() {
           directly.
         </p>
 
-        <h2 className="text-xs uppercase tracking-[0.12em] text-ink-muted mb-3">
+        <h2
+          id="designers"
+          className="text-xs uppercase tracking-[0.12em] text-ink-muted mb-3 scroll-mt-6"
+        >
           Commissions, murals and other projects
         </h2>
         <p className="text-ink-muted leading-relaxed mb-4">

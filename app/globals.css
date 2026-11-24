@@ -7,6 +7,7 @@
     --color-ink: #211f1c;
     --color-ink-muted: #6f6a5f;
     --color-accent: #000000;
+    --color-placeholder: #d9d6cf;
 
     --font-sans: var(--font-sans-variable);
     --font-serif: var(--font-serif-variable);
@@ -26,4 +27,24 @@
 
 @media (prefers-reduced-motion: reduce) {
     .fade-in { animation: none; }
+}
+
+
+/* Home page: the document scrolls; blocks snap on large screens only. Proximity, never
+   mandatory, so a block taller than the screen stays fully readable. */
+:root {
+    --header-h: 4.8125rem;
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    html:has(.home-snap) {
+        scroll-snap-type: y proximity;
+    }
+    .home-snap .snap-block {
+        scroll-snap-align: start;
+    }
+    /* The header scrolls away, so the first block snaps to the very top of the page. */
+    .home-snap .snap-first {
+        scroll-margin-top: var(--header-h);
+    }
 }
