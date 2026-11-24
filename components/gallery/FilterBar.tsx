@@ -25,7 +25,7 @@ export default function FilterBar({
       <div className="flex flex-wrap gap-2">
         <Link
           href={buildHref(current, { tag: undefined })}
-          className={!activeTag ? "text-ink" : "text-ink-muted hover:text-ink"}
+          className={`text-xs uppercase tracking-[0.12em] ${!activeTag ? "text-ink" : "text-ink-muted hover:text-ink"}`}
         >
           All
         </Link>
@@ -33,9 +33,9 @@ export default function FilterBar({
           <Link
             key={tag}
             href={buildHref(current, { tag })}
-            className={activeTag === tag ? "text-ink" : "text-ink-muted hover:text-ink"}
+            className={`text-xs uppercase tracking-[0.12em] ${activeTag === tag ? "text-ink" : "text-ink-muted hover:text-ink"}`}
           >
-            #{tag}
+            {tag}
           </Link>
         ))}
       </div>

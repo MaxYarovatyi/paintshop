@@ -31,6 +31,9 @@ export default function TurnstileWidget({ onToken }: { onToken: (token: string |
       widgetId = window.turnstile.render(ref.current, {
         sitekey: siteKey,
         callback: (t: string) => cb.current(t),
+        theme: "light",
+        size: "flexible",
+        appearance: "interaction-only",
         "expired-callback": () => cb.current(null),
         "error-callback": () => cb.current(null),
       });

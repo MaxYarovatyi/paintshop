@@ -6,7 +6,6 @@ import PriceTag from "@/components/painting-detail/PriceTag";
 import InquiryForm from "@/components/painting-detail/InquiryForm";
 import PageContainer from "@/components/layout/PageContainer";
 import { getPaintingImageUrl } from "@/lib/utils/imageUrl";
-import DetailsGrid from "@/components/painting-detail/DetailsGrid";
 import ShareButtons from "@/components/painting-detail/ShareButtons";
 import { SITE_URL, SHOP_NAME, ARTIST_NAME } from "@/lib/brand";
 
@@ -82,12 +81,22 @@ const jsonLd = {
             {painting.title}
           </h1>
           <p className="mt-2 text-sm text-ink-muted">
-            {[painting.medium, painting.yearCreated].filter(Boolean).join(", ")}
+            {[
+              painting.medium,
+              `${painting.widthCm} x ${painting.heightCm} cm`,
+              painting.yearCreated,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
 
           <div className="mt-6 mb-8">
             <PriceTag priceUsd={painting.priceUsd} status={painting.status} />
           </div>
+
+          {painting.description && (
+            <p className="mb-10 text-ink leading-relaxed">{painting.description}</p>
+          )}
 
           {painting.status === "available" && (
             <section aria-labelledby="inquire" className="mb-10">
@@ -103,18 +112,7 @@ const jsonLd = {
             </p>
           )}
 
-          <DetailsGrid
-            medium={painting.medium}
-            widthCm={painting.widthCm}
-            heightCm={painting.heightCm}
-            yearCreated={painting.yearCreated}
-          />
-
-          {painting.description && (
-            <p className="mt-6 text-ink leading-relaxed">{painting.description}</p>
-          )}
-
-          <div className="mt-8">
+          <div>
             <ShareButtons url={`${SITE_URL}/paintings/${painting.slug}`} title={painting.title} />
           </div>
         </div>

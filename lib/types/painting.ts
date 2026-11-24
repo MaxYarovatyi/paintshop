@@ -29,4 +29,6 @@ export interface PaintingImage
     altText: string;
     sortOrder: number;
     isPrimary: boolean;
+    widthPx: number | null;
+    heightPx: number | null;
 }

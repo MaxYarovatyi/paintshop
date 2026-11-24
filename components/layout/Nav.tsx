@@ -29,7 +29,7 @@ export default function Nav() {
 
         <button 
             onClick={()=> setOpen(!open)}
-            className="sm:hidden text-sm text-ink"
+            className="sm:hidden text-sm text-ink py-3 -my-3 px-2 -mx-2"
             aria-expanded={open}
             aria-label="Toggle menu">
             {open ? "Close": "Menu"}
