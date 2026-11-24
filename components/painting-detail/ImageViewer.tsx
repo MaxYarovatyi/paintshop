@@ -43,7 +43,7 @@ export default function ImageViewer({
       <button
         type="button"
         onClick={() => setLightboxOpen(true)}
-        className="relative block w-full h-[58svh] lg:h-[calc(100dvh-10rem)] lg:max-h-[860px] lg:min-h-[480px] cursor-zoom-in overflow-hidden"
+        className="relative block w-full h-[50svh] sm:h-[58svh] lg:h-[calc(100dvh-10rem)] lg:max-h-[860px] lg:min-h-[480px] cursor-zoom-in overflow-hidden"
         aria-label="Open full size image"
       >
         <AnimatePresence mode="wait">
@@ -84,7 +84,7 @@ export default function ImageViewer({
               onClick={() => setActiveIndex(i)}
               aria-label={`Show image ${i + 1}`}
               aria-current={i === activeIndex}
-              className={`relative h-16 w-16 md:h-20 md:w-20 shrink-0 border transition-opacity ${
+              className={`relative h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 shrink-0 border transition-opacity ${
                 i === activeIndex
                   ? "border-ink"
                   : "border-transparent opacity-60 hover:opacity-100"

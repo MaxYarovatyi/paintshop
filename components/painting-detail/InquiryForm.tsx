@@ -109,7 +109,7 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
               key={c.name}
               type="button"
               onClick={() => handleChannelChange(c.name)}
-              className={`px-3 py-1.5 text-sm border transition-colors ${
+              className={`px-3 py-3 sm:py-1.5 text-sm border transition-colors ${
                 channel === c.name ? "border-ink bg-ink text-canvas" : "border-canvas-border text-ink-muted"
               }`}
             >

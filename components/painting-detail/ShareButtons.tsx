@@ -27,11 +27,11 @@ export default function ShareButtons({url, title}: {url:string; title:string}) {
     return (
         <div className="flex items-center gap-2">
             <span className="text-xs uppercase tracking-wide text-ink-muted mr-1">Share</span>
-            <button onClick={handleCopy} className="w-8 h-8 flex items-center justify-center border border-canvas-border text-ink-muted hover:border-ink hover:text-ink transition-colors">
+            <button onClick={handleCopy} className="w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center border border-canvas-border text-ink-muted hover:border-ink hover:text-ink transition-colors">
                 {copied ? <CheckIcon className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
             </button>
             {links.map(({label, href, Icon})=> (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={`Share on ${label}`} className="w-8 h-8 flex items-center justify-center border border-canvas-border text-ink-muted hover:border-ink hover:text-ink transition-colors">
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={`Share on ${label}`} className="w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center border border-canvas-border text-ink-muted hover:border-ink hover:text-ink transition-colors">
                     <Icon className="w-4 h-4" /> 
                 </a>
             ))}

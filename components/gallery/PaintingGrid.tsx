@@ -16,7 +16,7 @@ export default function PaintingGrid({ paintings }: { paintings: Painting[] }) {
       initial={false}
       animate="visible"
       variants={staggerChildren}
-      className="columns-2 lg:columns-3 gap-5"
+      className="columns-1 sm:columns-2 lg:columns-3 gap-5"
     >
       {paintings.map((p, i) => (
         <div key={p.id} className="break-inside-avoid mb-8">
