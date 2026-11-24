@@ -2,7 +2,7 @@
 import { useTransition } from "react";
 import { updateInquiryStatus } from "@/lib/actions/inquiries";
 
-const STATUSES = ["new", "contacted", "completed"] as const;
+import { INQUIRY_STATUSES, INQUIRY_STATUS_LABELS } from "@/lib/inquiries/status";
 
 export default function InquiryStatusSelect({
     inquiryId,
@@ -20,8 +20,8 @@ export default function InquiryStatusSelect({
       onChange={(e) => startTransition(() => updateInquiryStatus(inquiryId, e.target.value))}
       className="border border-neutral-300 px-2 py-1 disabled:opacity-50"
     >
-      {STATUSES.map((s) => (
-        <option key={s} value={s}>{s}</option>
+      {INQUIRY_STATUSES.map((s) => (
+        <option key={s} value={s}>{INQUIRY_STATUS_LABELS[s]}</option>
       ))}
     </select>
   );
