@@ -6,16 +6,19 @@ import { useState } from "react";
 import { getPaintingImageUrl } from "@/lib/utils/imageUrl";
 import Lightbox from "./Lightbox";
 
+/**
+ * Gallery-style viewer: the whole work sits on a neutral mat with room around it,
+ * at its natural proportions. The stage has a fixed height, so the layout does not
+ * jump when images of different shapes are selected. Thumbnails are a quiet row below.
+ */
 export default function ImageViewer({
   images,
   title,
-  widthCm,
-  heightCm
 }: {
   images: PaintingImage[];
   title: string;
-  widthCm: number;
-  heightCm: number;
+  widthCm?: number;
+  heightCm?: number;
 }) {
   const sorted = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
   const [activeIndex, setActiveIndex] = useState(
@@ -27,51 +30,20 @@ export default function ImageViewer({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const active = sorted[activeIndex];
 
-  const rawRatio = widthCm / heightCm;
-  const ratio = Math.min(Math.max(rawRatio, 0.6), 1.8)
-
   if (!active) {
     return (
-      <div className="aspect-[4/5] w-full bg-canvas-muted flex items-center justify-center text-ink-muted">
+      <div className="h-[55svh] w-full bg-canvas-muted flex items-center justify-center text-ink-muted">
         No image
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col md:flex-row md:items-start gap-3">
-      {sorted.length > 1 && (
-        <div className="flex md:flex-col gap-2 order-2 md:order-1">
-          {sorted.map((img, i) => (
-            <button
-              key={img.id}
-              type="button"
-              onClick={() => setActiveIndex(i)}
-              aria-label={`Show image ${i + 1}`}
-              aria-current={i === activeIndex}
-              className={`relative w-16 md:w-20 aspect-[4/5] overflow-hidden border shrink-0 ${
-                i === activeIndex
-                  ? "border-ink"
-                  : "border-transparent opacity-70"
-              }`}
-            >
-              <Image
-                src={getPaintingImageUrl(img.storagePath)}
-                alt={img.altText || title}
-                fill
-                sizes="80px"
-                className="object-cover"
-              />
-            </button>
-          ))}
-        </div>
-      )}
-
+    <div>
       <button
         type="button"
         onClick={() => setLightboxOpen(true)}
-        style={{"--ratio": ratio} as React.CSSProperties}
-        className="painting-frame order-1 md:order-2 bg-canvas-muted relative overflow-hidden block cursor-zoom-in"
+        className="relative block w-full h-[58svh] lg:h-[calc(100dvh-10rem)] lg:max-h-[860px] lg:min-h-[480px] bg-canvas-muted cursor-zoom-in overflow-hidden"
         aria-label="Open full size image"
       >
         <AnimatePresence mode="wait">
@@ -81,19 +53,54 @@ export default function ImageViewer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="absolute inset-0"
+            className="absolute inset-0 p-5 md:p-10"
           >
-            <Image
-              src={getPaintingImageUrl(active.storagePath)}
-              alt={active.altText || title}
-              fill
-              sizes="(max-width: 768px) 100vw, 60vw"
-              className="object-contain"
-              priority
-            />
+            <div className="relative h-full w-full">
+              <Image
+                src={getPaintingImageUrl(active.storagePath)}
+                alt={active.altText || title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 70vw"
+                className="object-contain"
+                priority
+              />
+            </div>
           </motion.div>
         </AnimatePresence>
+
+        {sorted.length > 1 && (
+          <span className="absolute bottom-3 left-4 text-xs tabular-nums text-ink-muted">
+            {activeIndex + 1} / {sorted.length}
+          </span>
+        )}
       </button>
+
+      {sorted.length > 1 && (
+        <div className="mt-3 flex gap-2 overflow-x-auto">
+          {sorted.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => setActiveIndex(i)}
+              aria-label={`Show image ${i + 1}`}
+              aria-current={i === activeIndex}
+              className={`relative h-16 w-16 md:h-20 md:w-20 shrink-0 bg-canvas-muted border transition-opacity ${
+                i === activeIndex
+                  ? "border-ink"
+                  : "border-transparent opacity-60 hover:opacity-100"
+              }`}
+            >
+              <Image
+                src={getPaintingImageUrl(img.storagePath)}
+                alt={img.altText || title}
+                fill
+                sizes="80px"
+                className="object-contain p-1"
+              />
+            </button>
+          ))}
+        </div>
+      )}
 
       {lightboxOpen && (
         <Lightbox
