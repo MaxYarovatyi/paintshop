@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { slugify } from "@/lib/utils/slugify";
 import { redirect } from "next/navigation";
 import { revalidatePath, updateTag } from "next/cache";
+import { z } from "zod";
 
 const PAINTING_STATUSES = ["available", "reserved", "sold"];
 
@@ -89,10 +90,24 @@ export async function deletePainting(id: string) {
   redirect("/admin");
 }
 
+function toDim(v: FormDataEntryValue | undefined): number | null {
+  if (typeof v !== "string" || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
 export async function uploadPaintingImages(paintingId: string, slug: string, formData: FormData) {
   const { supabase } = await requireAdmin();
   const files = formData.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
   if (files.length === 0) return;
+
+  // Pixel sizes are measured in the browser. They only set a display ratio,
+  // so a missing or invalid value falls back to null.
+  const dim = z.number().int().min(1).max(30000).nullable();
+  const sizes = files.map((_, i) => ({
+    w: dim.safeParse(toDim(formData.getAll("widths")[i])),
+    h: dim.safeParse(toDim(formData.getAll("heights")[i])),
+  }));
 
   const { data: existing } = await supabase
     .from("product_images")
@@ -102,7 +117,9 @@ export async function uploadPaintingImages(paintingId: string, slug: string, for
   let nextSortOrder = existing && existing.length > 0 ? Math.max(...existing.map((e) => e.sort_order)) + 1 : 0;
   let needsPrimary = !existing?.some((e) => e.is_primary);
 
-  for (const file of files) {
+  for (const [i, file] of files.entries()) {
+    const size = sizes[i];
+    const hasSize = size.w.success && size.h.success && size.w.data && size.h.data;
     const path = `${slug}/${crypto.randomUUID()}-${file.name}`;
     const { error: uploadError } = await supabase.storage.from("paintings").upload(path, file);
     if (uploadError) throw new Error(uploadError.message);
@@ -113,6 +130,8 @@ export async function uploadPaintingImages(paintingId: string, slug: string, for
       alt_text: "",
       sort_order: nextSortOrder,
       is_primary: needsPrimary,
+      width_px: hasSize ? size.w.data : null,
+      height_px: hasSize ? size.h.data : null,
     });
     if (insertError) throw new Error(insertError.message);
 

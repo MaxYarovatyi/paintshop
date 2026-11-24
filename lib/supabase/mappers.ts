@@ -7,6 +7,8 @@ export interface PaintingImageRow {
   alt_text: string;
   sort_order: number;
   is_primary: boolean;
+  width_px: number | null;
+  height_px: number | null;
 }
 
 export interface PaintingRow {
@@ -37,6 +39,8 @@ function mapImage(row: PaintingImageRow): PaintingImage {
     altText: row.alt_text,
     sortOrder: row.sort_order,
     isPrimary: row.is_primary,
+    widthPx: row.width_px ?? null,
+    heightPx: row.height_px ?? null,
   };
 }
 

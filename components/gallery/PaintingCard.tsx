@@ -14,10 +14,14 @@ export default function PaintingCard({
   painting: Painting;
   priority: boolean;
 }) {
-  const isAvailable = painting.status === "available";
   const primaryImage =
     painting.images.find((i) => i.isPrimary) ?? painting.images[0];
-  const rawRatio = painting.widthCm / painting.heightCm;
+  // The photo's own ratio when known, so no empty bands appear around it.
+  // Older images without stored pixel size fall back to the canvas size.
+  const rawRatio =
+    primaryImage?.widthPx && primaryImage.heightPx
+      ? primaryImage.widthPx / primaryImage.heightPx
+      : painting.widthCm / painting.heightCm;
   const ratio = Math.min(Math.max(rawRatio, 0.5), 2);
 
   return (
@@ -25,7 +29,7 @@ export default function PaintingCard({
       <Link href={`/paintings/${painting.slug}`} className="group block">
         <div
           style={{ aspectRatio: ratio }}
-          className="w-full max-h-[70vh] mx-auto bg-canvas-muted overflow-hidden relative"
+          className="w-full max-h-[70vh] mx-auto overflow-hidden relative"
         >
           {primaryImage ? (
             <Image
@@ -41,17 +45,18 @@ export default function PaintingCard({
               {painting.title}
             </div>
           )}
-
-          {!isAvailable && (
-            <span className="absolute top-3 left-3 bg-white/90 px-2 py-1 text-xs uppercase tracking-wide">
-              {painting.status === "sold" ? "Sold" : "Reserved"}
-            </span>
-          )}
         </div>
         <div className="mt-3 flex items-baseline justify-between">
           <h3 className="font-serif text-base">{painting.title}</h3>
-          {painting.status !== "sold" && (
-            <span className="text-sm">{formatPrice(painting.priceUsd)}</span>
+          {painting.status === "sold" ? (
+            <span className="text-sm text-ink-muted">Sold</span>
+          ) : (
+            <span className="text-sm">
+              {formatPrice(painting.priceUsd)}
+              {painting.status === "reserved" && (
+                <span className="ml-2 text-ink-muted">Reserved</span>
+              )}
+            </span>
           )}
         </div>
         <p className="text-sm text-ink-muted">{painting.medium}</p>

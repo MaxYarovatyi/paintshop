@@ -19,14 +19,32 @@ export default function ImageManager({ painting }: { painting: Painting }) {
 
   const sortedImages = [...painting.images].sort((a, b) => a.sortOrder - b.sortOrder);
 
+  async function measureImage(file: File): Promise<{ width: number; height: number }> {
+    try {
+      // Applies EXIF orientation, like the browser does when it shows the image.
+      const bitmap = await createImageBitmap(file);
+      const size = { width: bitmap.width, height: bitmap.height };
+      bitmap.close();
+      return size;
+    } catch {
+      return { width: 0, height: 0 };
+    }
+  }
+
   function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    const formData = new FormData();
-    Array.from(files).forEach((file) => formData.append("files", file));
+    const list = Array.from(files);
 
     startTransition(async () => {
       try {
+        const formData = new FormData();
+        for (const file of list) {
+          const { width, height } = await measureImage(file);
+          formData.append("files", file);
+          formData.append("widths", String(width));
+          formData.append("heights", String(height));
+        }
         await uploadPaintingImages(painting.id, painting.slug, formData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Upload failed");
