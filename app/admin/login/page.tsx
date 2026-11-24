@@ -1,11 +1,20 @@
 // app/admin/login/page.tsx
+import { Suspense } from "react";
 import { signIn } from "@/lib/actions/auth";
 
-export default async function LoginPage({
+export default function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  return (
+    <Suspense>
+      <LoginForm searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function LoginForm({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   return (
     <div className="min-h-screen flex items-center justify-center bg-canvas">

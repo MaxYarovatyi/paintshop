@@ -3,7 +3,7 @@
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { slugify } from "@/lib/utils/slugify";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 const PAINTING_STATUSES = ["available", "reserved", "sold"];
 
@@ -52,6 +52,7 @@ export async function createPainting(formData: FormData) {
   const { data, error } = await supabase.from("products").insert(fields).select("id").single();
   if (error) throw new Error(error.message);
 
+  updateTag("catalog");
   revalidatePath("/admin");
   redirect(`/admin/paintings/${data.id}/edit`);
 }
@@ -65,8 +66,7 @@ export async function updatePainting(id: string, formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath(`/admin/paintings/${id}/edit`);
-  revalidatePath("/gallery");
-  revalidatePath("/");
+  updateTag("catalog");
   redirect('/admin');
 }
 
@@ -84,6 +84,7 @@ export async function deletePainting(id: string) {
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
+  updateTag("catalog");
   revalidatePath("/admin");
   redirect("/admin");
 }
@@ -120,8 +121,7 @@ export async function uploadPaintingImages(paintingId: string, slug: string, for
   }
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
-  revalidatePath("/gallery");
-  revalidatePath("/");
+  updateTag("catalog");
 }
 
 export async function deletePaintingImage(imageId: string, storagePath: string, paintingId: string) {
@@ -131,8 +131,7 @@ export async function deletePaintingImage(imageId: string, storagePath: string, 
   if (error) throw new Error(error.message);
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
-  revalidatePath("/gallery");
-  revalidatePath("/");
+  updateTag("catalog");
 }
 
 export async function setPrimaryImage(imageId: string, paintingId: string) {
@@ -142,8 +141,7 @@ export async function setPrimaryImage(imageId: string, paintingId: string) {
   if (error) throw new Error(error.message);
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
-  revalidatePath("/gallery");
-  revalidatePath("/");
+  updateTag("catalog");
 }
 
 export async function moveImage(paintingId:string, imageId: string, direction: "up" | "down") {
@@ -167,8 +165,7 @@ export async function moveImage(paintingId:string, imageId: string, direction: "
   await supabase.from("product_images").update({sort_order: current.sort_order}).eq("id", target.id);
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
-  revalidatePath("/gallery");
-  revalidatePath("/");
+  updateTag("catalog");
 }
 
 export async function updateImageAltText(imageId:string, paintingId: string, altText: string) {
@@ -176,5 +173,6 @@ export async function updateImageAltText(imageId:string, paintingId: string, alt
   const {error} = await supabase.from("product_images").update({alt_text:altText}).eq("id", imageId);
   if(error) throw new Error(error.message);
 
+  updateTag("catalog");
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
 }

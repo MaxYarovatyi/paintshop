@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPaintingBySlug } from "@/lib/supabase/queries";
+import { getPublicPaintingBySlug, getPublicPaintings } from "@/lib/supabase/publicQueries";
 import ImageViewer from "@/components/painting-detail/ImageViewer";
 import PriceTag from "@/components/painting-detail/PriceTag";
 import InquiryForm from "@/components/painting-detail/InquiryForm";
@@ -10,9 +10,18 @@ import DetailsGrid from "@/components/painting-detail/DetailsGrid";
 import ShareButtons from "@/components/painting-detail/ShareButtons";
 import { SITE_URL, SHOP_NAME, ARTIST_NAME } from "@/lib/brand";
 
+// Known works are prerendered at build time. Other slugs render on first request and are
+// then cached. At least one param is required, so an empty catalog gets a placeholder
+// that resolves to a 404.
+export async function generateStaticParams() {
+  const paintings = await getPublicPaintings();
+  const params = paintings.map((p) => ({ slug: p.slug }));
+  return params.length > 0 ? params : [{ slug: "_" }];
+}
+
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}): Promise<Metadata> {
   const {slug} = await params;
-  const painting = await getPaintingBySlug(slug);
+  const painting = await getPublicPaintingBySlug(slug);
   if(!painting) return {title: "Painting not found"};
 
   const primaryImage = painting.images.find((i)=> i.isPrimary) ?? painting.images[0];
@@ -34,7 +43,7 @@ export default async function PaintingDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const painting = await getPaintingBySlug(slug);
+  const painting = await getPublicPaintingBySlug(slug);
   if (!painting) notFound();
 
 const jsonLd = {

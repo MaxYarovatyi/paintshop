@@ -1,4 +1,5 @@
 // app/admin/(protected)/layout.tsx
+import { Suspense } from "react";
 import Link from "next/link";
 import { signOut } from "@/lib/actions/auth";
 
@@ -16,7 +17,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </form>
         </nav>
       </header>
-      <main className="px-8 py-10">{children}</main>
+      <main className="px-8 py-10">
+        {/* Admin pages read the session, which is request-time data. */}
+        <Suspense fallback={<p className="text-ink-muted">Loading…</p>}>{children}</Suspense>
+      </main>
     </div>
   );
 }
