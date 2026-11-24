@@ -1,5 +1,6 @@
+"use client";
 import Link from "next/link";
-import { aspectRatio, motion } from "motion/react";
+import { motion } from "motion/react";
 import type { Painting } from "@/lib/types/painting";
 import { formatPrice } from "@/lib/utils/formatPrice";
 import { fadeUp } from "@/components/motion/variants";
@@ -22,7 +23,10 @@ export default function PaintingCard({
   return (
     <motion.div variants={fadeUp}>
       <Link href={`/paintings/${painting.slug}`} className="group block">
-        <div style={{aspectRatio: ratio}} className=" w-full bg-canvas-muted overflow-hidden relative">
+        <div
+          style={{ aspectRatio: ratio }}
+          className="w-full max-h-[70vh] mx-auto bg-canvas-muted overflow-hidden relative"
+        >
           {primaryImage ? (
             <Image
               src={getPaintingImageUrl(primaryImage.storagePath)}
@@ -30,7 +34,7 @@ export default function PaintingCard({
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               priority={priority}
-              className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
+              className="object-contain group-hover:scale-[1.02] transition-transform duration-300"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-neutral-400 text-sm">
@@ -40,19 +44,15 @@ export default function PaintingCard({
 
           {!isAvailable && (
             <span className="absolute top-3 left-3 bg-white/90 px-2 py-1 text-xs uppercase tracking-wide">
-              {painting.status}
+              {painting.status === "sold" ? "Sold" : "Reserved"}
             </span>
           )}
         </div>
         <div className="mt-3 flex items-baseline justify-between">
           <h3 className="font-serif text-base">{painting.title}</h3>
-          <span
-            className={
-              isAvailable ? "text-sm" : "text-sm text-neutral-400 line-through"
-            }
-          >
-            {formatPrice(painting.priceUsd)}
-          </span>
+          {painting.status !== "sold" && (
+            <span className="text-sm">{formatPrice(painting.priceUsd)}</span>
+          )}
         </div>
         <p className="text-sm text-ink-muted">{painting.medium}</p>
       </Link>

@@ -1,1 +1,1 @@
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://paintshop-seven.vercel.app";
+export { SITE_URL } from "./brand";

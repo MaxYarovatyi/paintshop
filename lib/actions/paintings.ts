@@ -5,20 +5,43 @@ import { slugify } from "@/lib/utils/slugify";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
+const PAINTING_STATUSES = ["available", "reserved", "sold"];
+
 function parsePaintingFields(formData: FormData) {
+  const str = (key: string) => ((formData.get(key) as string) || "").trim();
+  const title = str("title");
+  const status = str("status");
+  const priceUsd = Number(formData.get("priceUsd"));
+  const widthCm = Number(formData.get("widthCm"));
+  const heightCm = Number(formData.get("heightCm"));
+  const yearRaw = str("yearCreated");
+  const yearCreated = yearRaw ? Number(yearRaw) : null;
+
+  if (!title) throw new Error("Title is required");
+  if (!PAINTING_STATUSES.includes(status)) throw new Error("Invalid status");
+  if (!Number.isFinite(priceUsd) || priceUsd < 0) throw new Error("Price must be a non-negative number");
+  if (!Number.isFinite(widthCm) || widthCm <= 0) throw new Error("Width must be greater than 0");
+  if (!Number.isFinite(heightCm) || heightCm <= 0) throw new Error("Height must be greater than 0");
+  if (yearCreated !== null && (!Number.isInteger(yearCreated) || yearCreated < 1000 || yearCreated > 3000)) {
+    throw new Error("Invalid year");
+  }
+
+  const slug = slugify(str("slug") || title);
+  if (!slug) throw new Error("Could not generate a slug, please enter one");
+
   return {
-    title: formData.get("title") as string,
-    slug: (formData.get("slug") as string) || slugify(formData.get("title") as string),
-    description: (formData.get("description") as string) || "",
-    price_usd: Number(formData.get("priceUsd")),
-    status: formData.get("status") as string,
-    width_cm: Number(formData.get("widthCm")),
-    height_cm: Number(formData.get("heightCm")),
-    medium: formData.get("medium") as string,
-    year_created: formData.get("yearCreated") ? Number(formData.get("yearCreated")) : null,
-    tags: (formData.get("tags") as string).split(",").map((t) => t.trim()).filter(Boolean),
+    title,
+    slug,
+    description: str("description"),
+    price_usd: priceUsd,
+    status,
+    width_cm: widthCm,
+    height_cm: heightCm,
+    medium: str("medium"),
+    year_created: yearCreated,
+    tags: str("tags").split(",").map((t) => t.trim()).filter(Boolean),
     is_featured: formData.get("isFeatured") === "on",
-    series_id: (formData.get("seriesId") as string) || null,
+    series_id: str("seriesId") || null,
   };
 }
 
@@ -26,7 +49,7 @@ export async function createPainting(formData: FormData) {
   const supabase = await createClient();
   const fields = parsePaintingFields(formData);
 
-  const { data, error } = await supabase.from("paintings").insert(fields).select("id").single();
+  const { data, error } = await supabase.from("products").insert(fields).select("id").single();
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin");
@@ -37,7 +60,7 @@ export async function updatePainting(id: string, formData: FormData) {
   const supabase = await createClient();
   const fields = parsePaintingFields(formData);
 
-  const { error } = await supabase.from("paintings").update(fields).eq("id", id);
+  const { error } = await supabase.from("products").update(fields).eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin");
@@ -50,15 +73,15 @@ export async function updatePainting(id: string, formData: FormData) {
 export async function deletePainting(id: string) {
   const supabase = await createClient();
   const { data: images } = await supabase
-    .from("painting_images")
+    .from("product_images")
     .select("storage_path")
-    .eq("painting_id", id);
+    .eq("product_id", id);
 
   if (images && images.length > 0) {
     await supabase.storage.from("paintings").remove(images.map((i) => i.storage_path));
   }
 
-  const { error } = await supabase.from("paintings").delete().eq("id", id);
+  const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin");
@@ -71,9 +94,9 @@ export async function uploadPaintingImages(paintingId: string, slug: string, for
   if (files.length === 0) return;
 
   const { data: existing } = await supabase
-    .from("painting_images")
+    .from("product_images")
     .select("id, is_primary, sort_order")
-    .eq("painting_id", paintingId);
+    .eq("product_id", paintingId);
 
   let nextSortOrder = existing && existing.length > 0 ? Math.max(...existing.map((e) => e.sort_order)) + 1 : 0;
   let needsPrimary = !existing?.some((e) => e.is_primary);
@@ -83,8 +106,8 @@ export async function uploadPaintingImages(paintingId: string, slug: string, for
     const { error: uploadError } = await supabase.storage.from("paintings").upload(path, file);
     if (uploadError) throw new Error(uploadError.message);
 
-    const { error: insertError } = await supabase.from("painting_images").insert({
-      painting_id: paintingId,
+    const { error: insertError } = await supabase.from("product_images").insert({
+      product_id: paintingId,
       storage_path: path,
       alt_text: "",
       sort_order: nextSortOrder,
@@ -104,7 +127,7 @@ export async function uploadPaintingImages(paintingId: string, slug: string, for
 export async function deletePaintingImage(imageId: string, storagePath: string, paintingId: string) {
   const supabase = await createClient();
   await supabase.storage.from("paintings").remove([storagePath]);
-  const { error } = await supabase.from("painting_images").delete().eq("id", imageId);
+  const { error } = await supabase.from("product_images").delete().eq("id", imageId);
   if (error) throw new Error(error.message);
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
@@ -114,8 +137,8 @@ export async function deletePaintingImage(imageId: string, storagePath: string, 
 
 export async function setPrimaryImage(imageId: string, paintingId: string) {
   const supabase = await createClient();
-  await supabase.from("painting_images").update({ is_primary: false }).eq("painting_id", paintingId);
-  const { error } = await supabase.from("painting_images").update({ is_primary: true }).eq("id", imageId);
+  await supabase.from("product_images").update({ is_primary: false }).eq("product_id", paintingId);
+  const { error } = await supabase.from("product_images").update({ is_primary: true }).eq("id", imageId);
   if (error) throw new Error(error.message);
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
@@ -126,9 +149,9 @@ export async function setPrimaryImage(imageId: string, paintingId: string) {
 export async function moveImage(paintingId:string, imageId: string, direction: "up" | "down") {
   const supabase = await createClient();
   const {data: images, error} =await supabase
-    .from("painting_images")
+    .from("product_images")
     .select("id, sort_order")
-    .eq("painting_id", paintingId)
+    .eq("product_id", paintingId)
     .order("sort_order", {ascending: true});
 
   if(error || !images) throw new Error(error?.message ?? "Could not load images");
@@ -140,8 +163,8 @@ export async function moveImage(paintingId:string, imageId: string, direction: "
   const current = images[index];
   const target = images[targetIndex];
 
-  await supabase.from("painting_images").update({sort_order: target.sort_order}).eq("id",current.id);
-  await supabase.from("painting_images").update({sort_order: current.sort_order}).eq("id", target.id);
+  await supabase.from("product_images").update({sort_order: target.sort_order}).eq("id",current.id);
+  await supabase.from("product_images").update({sort_order: current.sort_order}).eq("id", target.id);
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);
   revalidatePath("/gallery");
@@ -150,7 +173,7 @@ export async function moveImage(paintingId:string, imageId: string, direction: "
 
 export async function updateImageAltText(imageId:string, paintingId: string, altText: string) {
   const supabase = await createClient();
-  const {error} = await supabase.from("painting_images").update({alt_text:altText}).eq("id", imageId);
+  const {error} = await supabase.from("product_images").update({alt_text:altText}).eq("id", imageId);
   if(error) throw new Error(error.message);
 
   revalidatePath(`/admin/paintings/${paintingId}/edit`);

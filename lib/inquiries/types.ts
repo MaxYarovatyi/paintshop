@@ -1,18 +1,9 @@
-import { label } from "motion/react-client";
 
-export interface InquiryIntent {
-    paintingId: string;
-    paintingTitle: string;
-    paintingSlug: string;
-    buyerName: string;
-    buyerContact: string;
-    buyerCountry: string;
-    message?: string;
-}
 
 export const CONTACT_CHANNELS = [
     {name: "whatsapp", label: "WhatsApp"},
-    {name: "telegram", label: "Telergam"},
+    {name: "telegram", label: "Telegram"},
     {name: "viber", label: "Viber"},
-    {name: "instagram", label: "Instagram"}
+    {name: "instagram", label: "Instagram"},
+    {name: "email", label: "Email"}
 ] as const;
