@@ -4,7 +4,7 @@ import type { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { slugify } from "@/lib/utils/slugify";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 const STATUSES = ["coming", "live", "archive"];
 
@@ -61,6 +61,7 @@ export async function createSeries(formData: FormData) {
     throw new Error(error.message);
   }
 
+  updateTag("catalog");
   revalidatePath("/admin/series");
   redirect(`/admin/series/${data.id}/edit`);
 }
@@ -90,8 +91,7 @@ export async function updateSeries(id: string, formData: FormData) {
 
   revalidatePath("/admin/series");
   revalidatePath(`/admin/series/${id}/edit`);
-  revalidatePath("/gallery");
-  revalidatePath("/");
+  updateTag("catalog");
 }
 
 export async function deleteSeries(id: string) {
@@ -115,6 +115,7 @@ export async function deleteSeries(id: string) {
     await supabase.storage.from("paintings").remove([existing.cover_image_path]);
   }
 
+  updateTag("catalog");
   revalidatePath("/admin/series");
   redirect("/admin/series");
 }

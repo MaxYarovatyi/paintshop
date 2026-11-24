@@ -3,7 +3,7 @@ import ArtistStatement from "@/components/home/ArtistStatement";
 import StatsRow from "@/components/home/StatsRow";
 import PageContainer from "@/components/layout/PageContainer";
 import Section from "@/components/layout/Section";
-import { getFeaturedPaintings } from "@/lib/supabase/queries";
+import { getPublicPaintings } from "@/lib/supabase/publicQueries";
 
 export const metadata = {
   title: "Gallery — Original Abstract & Postmodernist Paintings",
@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-    const featured = await getFeaturedPaintings();
+    const featured = (await getPublicPaintings()).filter((p) => p.isFeatured);
 
     return (
         <>
