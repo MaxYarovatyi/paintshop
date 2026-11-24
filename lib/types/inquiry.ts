@@ -1,9 +1,11 @@
-export type InquiryStatus = "new" | "contacted" | "completed";
+import type { InquiryStatus } from "@/lib/inquiries/status";
+
+export type { InquiryStatus };
 
 export interface Inquiry
 {
     id: string;
-    paintingId: string;
+    paintingId: string | null;
     buyerName: string;
     buyerContact: string;
     buyerCountry: string;

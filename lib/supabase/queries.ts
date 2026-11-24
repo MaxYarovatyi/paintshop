@@ -5,7 +5,7 @@ import type { Series, SeriesStatus } from "../types/series";
 
 interface InquiryRow {
   id: string;
-  painting_id: string;
+  product_id: string | null;
   buyer_name: string;
   buyer_country: string;
   buyer_contact: string;
@@ -91,7 +91,7 @@ export async function getSeriesById(id: string): Promise<Series | null> {
 function mapInquiry(row: InquiryRow) {
   return {
     id: row.id,
-    paintingId: row.painting_id,
+    paintingId: row.product_id,
     buyerName: row.buyer_name,
     buyerContact: row.buyer_contact,
     buyerCountry: row.buyer_country,

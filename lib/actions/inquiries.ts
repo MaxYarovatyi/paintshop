@@ -1,16 +1,18 @@
 "use server"
-import { createClient } from "../supabase/server"
 import { createAdminClient } from "../supabase/admin";
 import { isFormTokenValid } from "../security/formToken";
 import { verifyTurnstile } from "../security/turnstile";
 import { getClientIp, hashIp } from "../security/ip";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { requireAdmin } from "../auth/requireAdmin";
+import { INQUIRY_STATUSES } from "../inquiries/status";
 import { sendTelegramNotification, escapeHtml } from "../notifications/telegram";
 import { CONTACT_CHANNELS } from "../inquiries/types";
 import { inquirySchema, fieldErrors } from "../inquiries/schema";
 import { SITE_URL } from "../brand";
 
-const INQUIRY_STATUSES = ["new", "contacted", "completed"];
+const statusSchema = z.enum(INQUIRY_STATUSES);
 
 export type SubmitResult =
     | { ok: true }
@@ -72,7 +74,8 @@ export async function submitInquiry(input: unknown): Promise<SubmitResult> {
         }
 
         const { error } = await supabase.from("inquiries").insert({
-            painting_id: product.id,
+            product_id: product.id,
+            type: "purchase",
             buyer_name: name,
             buyer_contact: contact,
             buyer_country: country,
@@ -108,9 +111,16 @@ async function notifyNewInquiry(i: {
 }
 
 export async function updateInquiryStatus(id: string, status: string) {
-    if (!INQUIRY_STATUSES.includes(status)) throw new Error("Invalid status");
-    const supabase = await createClient();
-    const { error } = await supabase.from("inquiries").update({ status }).eq("id", id);
+    const { supabase } = await requireAdmin();
+    const parsedId = z.uuid().safeParse(id);
+    const parsedStatus = statusSchema.safeParse(status);
+    if (!parsedId.success || !parsedStatus.success) throw new Error("Invalid status");
+
+    // Updates the inquiry and writes its inquiry_events row in one transaction.
+    const { error } = await supabase.rpc("set_inquiry_status", {
+        p_inquiry_id: parsedId.data,
+        p_status: parsedStatus.data,
+    });
     if (error) throw new Error(error.message);
     revalidatePath("/admin/inquiries");
 }

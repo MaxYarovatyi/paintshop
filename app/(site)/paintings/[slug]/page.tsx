@@ -63,17 +63,36 @@ const jsonLd = {
 };
 
   return (
-    <PageContainer className="py-12 md:py-16">
+    <PageContainer className="py-6 md:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-8 md:gap-16">
-        <ImageViewer images={painting.images} title={painting.title} widthCm={painting.widthCm} heightCm={painting.heightCm}/>
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px] gap-8 lg:gap-12">
+        <ImageViewer images={painting.images} title={painting.title} />
 
-        <div>
-          <h1 className="font-serif text-3xl md:text-4xl mb-6 text-ink">
+        <div className="lg:pt-2">
+          <h1 className="font-serif text-3xl md:text-4xl leading-tight text-ink">
             {painting.title}
           </h1>
+          <p className="mt-2 text-sm text-ink-muted">
+            {[painting.medium, painting.yearCreated].filter(Boolean).join(", ")}
+          </p>
 
-          <PriceTag priceUsd={painting.priceUsd} status = {painting.status} />
+          <div className="mt-6 mb-8">
+            <PriceTag priceUsd={painting.priceUsd} status={painting.status} />
+          </div>
+
+          {painting.status === "available" && (
+            <section aria-labelledby="inquire" className="mb-10">
+              <h2 id="inquire" className="mb-4 text-xs uppercase tracking-wide text-ink-muted">
+                Inquire about this work
+              </h2>
+              <InquiryForm paintingId={painting.id} />
+            </section>
+          )}
+          {painting.status === "reserved" && (
+            <p className="mb-10 text-sm text-ink-muted">
+              This work is reserved. Contact us if you would like to be informed should it become available again.
+            </p>
+          )}
 
           <DetailsGrid
             medium={painting.medium}
@@ -81,17 +100,14 @@ const jsonLd = {
             heightCm={painting.heightCm}
             yearCreated={painting.yearCreated}
           />
-          <p className="text-ink leading-relaxed text-base md:text-lg my-6">
-            {painting.description}
-          </p>
 
-          <ShareButtons url={`${SITE_URL}/paintings/${painting.slug}`} title={painting.title} />
-
-          {painting.status === "available" && (
-            <div className="mt-10">
-              <InquiryForm paintingId={painting.id} />
-            </div>
+          {painting.description && (
+            <p className="mt-6 text-ink leading-relaxed">{painting.description}</p>
           )}
+
+          <div className="mt-8">
+            <ShareButtons url={`${SITE_URL}/paintings/${painting.slug}`} title={painting.title} />
+          </div>
         </div>
       </div>
     </PageContainer>

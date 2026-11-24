@@ -13,20 +13,3 @@
 
     --max-width-content: 1400px;
 }
-
-.painting-frame {
-    /* Fit the whole painting in the viewport: width is capped so that
-       width / ratio never exceeds the available height. */
-    --max-h: calc(100dvh - 8rem);
-    width: min(100%, calc(var(--max-h) * var(--ratio)));
-    margin-inline: auto;
-    aspect-ratio: var(--ratio);
-}
-
-@media (min-width: 768px) {
-    .painting-frame {
-        --max-h: max(360px, calc(100dvh - 11rem));
-        margin-inline: 0;
-        min-width: 0;
-    }
-}

@@ -1,6 +1,7 @@
 // lib/actions/series.ts
 "use server";
-import { createClient } from "@/lib/supabase/server";
+import type { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { slugify } from "@/lib/utils/slugify";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -43,7 +44,7 @@ async function uploadCover(
 }
 
 export async function createSeries(formData: FormData) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const fields = parseSeriesFields(formData);
   const slug = (((formData.get("slug") as string) || "").trim() || slugify(fields.title));
   const cover = getCoverFile(formData);
@@ -65,7 +66,7 @@ export async function createSeries(formData: FormData) {
 }
 
 export async function updateSeries(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const fields = parseSeriesFields(formData); // slug is intentionally not updatable
   const cover = getCoverFile(formData);
 
@@ -94,7 +95,7 @@ export async function updateSeries(id: string, formData: FormData) {
 }
 
 export async function deleteSeries(id: string) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
 
   const { count } = await supabase
     .from("products")

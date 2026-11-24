@@ -1,6 +1,6 @@
 // lib/actions/paintings.ts
 "use server";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { slugify } from "@/lib/utils/slugify";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -46,7 +46,7 @@ function parsePaintingFields(formData: FormData) {
 }
 
 export async function createPainting(formData: FormData) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const fields = parsePaintingFields(formData);
 
   const { data, error } = await supabase.from("products").insert(fields).select("id").single();
@@ -57,7 +57,7 @@ export async function createPainting(formData: FormData) {
 }
 
 export async function updatePainting(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const fields = parsePaintingFields(formData);
 
   const { error } = await supabase.from("products").update(fields).eq("id", id);
@@ -71,7 +71,7 @@ export async function updatePainting(id: string, formData: FormData) {
 }
 
 export async function deletePainting(id: string) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const { data: images } = await supabase
     .from("product_images")
     .select("storage_path")
@@ -89,7 +89,7 @@ export async function deletePainting(id: string) {
 }
 
 export async function uploadPaintingImages(paintingId: string, slug: string, formData: FormData) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const files = formData.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
   if (files.length === 0) return;
 
@@ -125,7 +125,7 @@ export async function uploadPaintingImages(paintingId: string, slug: string, for
 }
 
 export async function deletePaintingImage(imageId: string, storagePath: string, paintingId: string) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   await supabase.storage.from("paintings").remove([storagePath]);
   const { error } = await supabase.from("product_images").delete().eq("id", imageId);
   if (error) throw new Error(error.message);
@@ -136,7 +136,7 @@ export async function deletePaintingImage(imageId: string, storagePath: string, 
 }
 
 export async function setPrimaryImage(imageId: string, paintingId: string) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   await supabase.from("product_images").update({ is_primary: false }).eq("product_id", paintingId);
   const { error } = await supabase.from("product_images").update({ is_primary: true }).eq("id", imageId);
   if (error) throw new Error(error.message);
@@ -147,7 +147,7 @@ export async function setPrimaryImage(imageId: string, paintingId: string) {
 }
 
 export async function moveImage(paintingId:string, imageId: string, direction: "up" | "down") {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const {data: images, error} =await supabase
     .from("product_images")
     .select("id, sort_order")
@@ -172,7 +172,7 @@ export async function moveImage(paintingId:string, imageId: string, direction: "
 }
 
 export async function updateImageAltText(imageId:string, paintingId: string, altText: string) {
-  const supabase = await createClient();
+  const { supabase } = await requireAdmin();
   const {error} = await supabase.from("product_images").update({alt_text:altText}).eq("id", imageId);
   if(error) throw new Error(error.message);
 

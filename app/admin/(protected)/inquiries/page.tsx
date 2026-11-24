@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getInquiries } from "@/lib/supabase/queries";
-import { updateInquiryStatus } from "@/lib/actions/inquiries";
 import InquiryStatusSelect from "@/components/admin/InquiryStatusSelect";
 
 export default async function InquiriesPage() {
