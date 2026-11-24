@@ -1,12 +1,14 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { submitInquiry } from "@/lib/actions/inquiries";
 import { useRouter } from "next/navigation";
 import { CONTACT_CHANNELS } from "@/lib/inquiries/types";
 import { COUNTRIES } from "@/lib/inquiries/countries";
 import { resolveContactMode } from "@/lib/inquiries/validation";
 import { inquirySchema, fieldErrors, MAX_MESSAGE } from "@/lib/inquiries/schema";
+import { getFormToken } from "@/lib/actions/formToken";
 import ContactFields from "./ContactFields";
+import TurnstileWidget from "./TurnstileWidget";
 
 export default function InquiryForm({ paintingId }: { paintingId: string }) {
   const router = useRouter();
@@ -20,6 +22,13 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
   const [messageError, setMessageError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [formToken, setFormToken] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState("");
+
+  useEffect(() => {
+    getFormToken().then(setFormToken).catch(() => {});
+  }, []);
 
   const country = COUNTRIES.find((c)=> c.code === countryCode);
 
@@ -70,7 +79,12 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
 
     startTransition(async () => {
       try {
-        const result = await submitInquiry(parsed.data);
+        const result = await submitInquiry({
+          ...parsed.data,
+          website: honeypot,
+          formToken,
+          turnstileToken,
+        });
         if (result.ok) {
           router.push("/inquiry-received");
           return;
@@ -84,7 +98,7 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
   }
 
   return (
-     <form onSubmit={handleSubmit} className="space-y-4">
+     <form onSubmit={handleSubmit} className="relative space-y-4">
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div>
@@ -122,7 +136,18 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
         className="w-full border-b border-canvas-border py-2 text-sm focus:outline-none focus:border-ink" />
       {messageError && <p className="text-xs text-red-600 -mt-2">{messageError}</p>}
 
-      <button type="submit" disabled={isPending}
+      {/* Honeypot: hidden from people, filled by bots. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label>
+          Website
+          <input type="text" name="website" tabIndex={-1} autoComplete="off"
+            value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+        </label>
+      </div>
+
+      <TurnstileWidget onToken={setTurnstileToken} />
+
+      <button type="submit" disabled={isPending || !formToken || !turnstileToken}
         className="w-full bg-ink text-canvas py-3 text-sm uppercase tracking-wide disabled:opacity-50">
         {isPending ? "Sending…" : "Send inquiry"}
       </button>
