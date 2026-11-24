@@ -93,7 +93,7 @@ export default function ContactFields({
                 onClick={() => setOpen((o) => !o)}
                 aria-haspopup="listbox"
                 aria-expanded={open}
-                className="flex items-center gap-1.5 py-2 pr-3 text-sm whitespace-nowrap"
+                className="flex items-center gap-1.5 py-2 pr-3 text-base sm:text-sm whitespace-nowrap"
               >
                 {country ? (
                   <>
@@ -115,7 +115,7 @@ export default function ContactFields({
           placeholder={contactPlaceholder(channel)}
           inputMode={isPhoneOnly ? "tel" : channel === "email" ? "email" : "text"}
           required
-          className="flex-1 min-w-0 bg-transparent py-2 text-sm focus:outline-none"
+          className="flex-1 min-w-0 bg-transparent py-2 text-base sm:text-sm focus:outline-none"
         />
       </div>
 
@@ -136,7 +136,7 @@ export default function ContactFields({
                 onClick={() => setOpen((o) => !o)}
                 aria-haspopup="listbox"
                 aria-expanded={open}
-                className="w-full flex items-center gap-2 border-b border-canvas-border py-2 text-sm text-left"
+                className="w-full flex items-center gap-2 border-b border-canvas-border py-2 text-base sm:text-sm text-left"
               >
                 {country ? (
                   <>

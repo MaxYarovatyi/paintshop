@@ -120,7 +120,7 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
       </div>
 
       <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required maxLength={80}
-        className="w-full border-b border-canvas-border py-2 text-sm focus:outline-none focus:border-ink" />
+        className="w-full border-b border-canvas-border py-2 text-base sm:text-sm focus:outline-none focus:border-ink" />
       {nameError && <p className="text-xs text-red-600 -mt-2">{nameError}</p>}
 
       <ContactFields
@@ -133,7 +133,7 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
       />
 
       <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Message (optional)" rows={3} maxLength={MAX_MESSAGE}
-        className="w-full border-b border-canvas-border py-2 text-sm focus:outline-none focus:border-ink" />
+        className="w-full border-b border-canvas-border py-2 text-base sm:text-sm focus:outline-none focus:border-ink" />
       {messageError && <p className="text-xs text-red-600 -mt-2">{messageError}</p>}
 
       {/* Honeypot: hidden from people, filled by bots. */}
@@ -148,7 +148,7 @@ export default function InquiryForm({ paintingId }: { paintingId: string }) {
       <TurnstileWidget onToken={setTurnstileToken} />
 
       <button type="submit" disabled={isPending || !formToken || !turnstileToken}
-        className="w-full bg-ink text-canvas py-3 text-sm uppercase tracking-wide disabled:opacity-50">
+        className="w-full bg-ink text-canvas py-3 text-sm uppercase tracking-wide disabled:opacity-40 disabled:cursor-not-allowed">
         {isPending ? "Sending…" : "Send inquiry"}
       </button>
     </form>
