@@ -8,7 +8,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import { getPaintingImageUrl } from "@/lib/utils/imageUrl";
 import DetailsGrid from "@/components/painting-detail/DetailsGrid";
 import ShareButtons from "@/components/painting-detail/ShareButtons";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, SHOP_NAME, ARTIST_NAME } from "@/lib/brand";
 
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}): Promise<Metadata> {
   const {slug} = await params;
@@ -43,15 +43,23 @@ const jsonLd = {
   name: painting.title,
   description: painting.description,
   image: painting.images.map((img) => getPaintingImageUrl(img.storagePath)),
-  offers: {
-    "@type": "Offer",
-    priceCurrency: "USD",
-    price: painting.priceUsd,
-    availability:
-      painting.status === "available"
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-  },
+  brand: { "@type": "Brand", name: SHOP_NAME },
+  creator: { "@type": "Person", name: ARTIST_NAME },
+  url: `${SITE_URL}/paintings/${painting.slug}`,
+  // Sold works carry no price anywhere, including structured data.
+  ...(painting.status === "sold"
+    ? {}
+    : {
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "USD",
+          price: painting.priceUsd,
+          availability:
+            painting.status === "available"
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+        },
+      }),
 };
 
   return (
@@ -81,11 +89,7 @@ const jsonLd = {
 
           {painting.status === "available" && (
             <div className="mt-10">
-              <InquiryForm
-                paintingId={painting.id}
-                paintingTitle={painting.title}
-                paintingSlug={painting.slug}
-              />
+              <InquiryForm paintingId={painting.id} />
             </div>
           )}
         </div>

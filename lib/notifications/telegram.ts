@@ -1,5 +1,9 @@
 export function escapeHtml(value: string): string {
-    return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 }
 
 export async function sendTelegramNotification(text:string) {
@@ -13,7 +17,7 @@ export async function sendTelegramNotification(text:string) {
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({chat_id: chatId, text, parse_mode: "HTML"}),
+            body: JSON.stringify({chat_id: chatId, text, parse_mode: "HTML", link_preview_options: { is_disabled: true }}),
         });
     } catch (err) {
         console.error("Telegram notification failed:", err);

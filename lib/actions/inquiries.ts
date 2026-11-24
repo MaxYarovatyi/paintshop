@@ -2,65 +2,64 @@
 import { createClient } from "../supabase/server"
 import { revalidatePath } from "next/cache";
 import { sendTelegramNotification, escapeHtml } from "../notifications/telegram";
-import { InquiryIntent } from "../inquiries/types";
-import { CHANNEL_CONTACT_TYPE, validateContact } from "../inquiries/validation";
+import { CONTACT_CHANNELS } from "../inquiries/types";
+import { inquirySchema, fieldErrors } from "../inquiries/schema";
+import { SITE_URL } from "../brand";
 
-const MAX_NAME = 100;
-const MAX_MESSAGE = 2000;
 const INQUIRY_STATUSES = ["new", "contacted", "completed"];
 
-export async function submitInquiry(order: InquiryIntent, preferredChannel: string) {
-    const buyerName = (order.buyerName ?? "").trim();
-    const buyerContact = (order.buyerContact ?? "").trim();
-    const buyerCountry = (order.buyerCountry ?? "").trim();
-    const message = (order.message ?? "").trim();
+export type SubmitResult =
+    | { ok: true }
+    | { ok: false; error: string; fields?: Partial<Record<string, string>> };
 
-    if (!buyerName || buyerName.length > MAX_NAME) throw new Error("Please enter a valid name");
-    if (!buyerCountry || buyerCountry.length > MAX_NAME) throw new Error("Please select your country");
-    if (message.length > MAX_MESSAGE) throw new Error("Message is too long");
-    if (!(preferredChannel in CHANNEL_CONTACT_TYPE)) throw new Error("Invalid contact channel");
-    if (!validateContact(preferredChannel, buyerContact)) {
-        throw new Error("Invalid contact info");
+export async function submitInquiry(input: unknown): Promise<SubmitResult> {
+    const parsed = inquirySchema.safeParse(input);
+    if (!parsed.success) {
+        return { ok: false, error: "Please check your details and try again.", fields: fieldErrors(parsed.error) };
     }
+    const { productId, name, channel, contact, country, message } = parsed.data;
 
     const supabase = await createClient();
 
-    // Never trust the title/availability sent by the browser.
-    const { data: painting } = await supabase
+    // Never trust title, slug or availability sent by the browser.
+    // The series join is explicit because a logged-in admin's session can see hidden works.
+    const { data: product } = await supabase
         .from("products")
-        .select("id, title, status")
-        .eq("id", order.paintingId)
-        .single();
-    if (!painting) throw new Error("Painting not found");
-    if (painting.status !== "available") throw new Error("This painting is no longer available");
+        .select("id, title, status, series:series_id(status)")
+        .eq("id", productId)
+        .maybeSingle();
+    const series = product?.series as { status: string } | { status: string }[] | null | undefined;
+    const seriesStatus = Array.isArray(series) ? series[0]?.status : series?.status;
+    if (!product || product.status !== "available" || seriesStatus === "coming") {
+        return { ok: false, error: "This work is not available for inquiries." };
+    }
 
     const { error } = await supabase.from("inquiries").insert({
-        painting_id: painting.id,
-        buyer_name: buyerName,
-        buyer_contact: buyerContact,
-        buyer_country: buyerCountry,
+        painting_id: product.id,
+        buyer_name: name,
+        buyer_contact: contact,
+        buyer_country: country,
         message: message || null,
         status: "new",
-        preferred_channel: preferredChannel
+        preferred_channel: channel
     });
 
     if (error) {
         console.error("submitInquiry error:", error.message);
-        throw new Error("Could not submit inquiry");
+        return { ok: false, error: "Your inquiry could not be sent. Please try again later." };
     }
 
+    const channelLabel = CONTACT_CHANNELS.find((c) => c.name === channel)?.label ?? channel;
     await sendTelegramNotification(
-        `<b>New inquiry</b>
-"${escapeHtml(painting.title)}"
-
-` +
-        `Name: ${escapeHtml(buyerName)}
-Contact: ${escapeHtml(buyerContact)}
-Country: ${escapeHtml(buyerCountry)}
-` +
-        `Prefers: ${escapeHtml(preferredChannel)}${message ? `
-Message: ${escapeHtml(message)}` : ""}`
+        `<b>New inquiry</b>\n"${escapeHtml(product.title)}"\n\n` +
+        `Name: ${escapeHtml(name)}\n` +
+        `Contact: ${escapeHtml(contact)}\n` +
+        `Country: ${escapeHtml(country)}\n` +
+        `Prefers: ${escapeHtml(channelLabel)}` +
+        (message ? `\nMessage: ${escapeHtml(message)}` : "") +
+        `\n\n<a href="${escapeHtml(SITE_URL + "/admin/inquiries")}">Open inquiries</a>`
     );
+    return { ok: true };
 }
 
 export async function updateInquiryStatus(id: string, status: string) {

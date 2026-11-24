@@ -44,19 +44,15 @@ export default function PaintingCard({
 
           {!isAvailable && (
             <span className="absolute top-3 left-3 bg-white/90 px-2 py-1 text-xs uppercase tracking-wide">
-              {painting.status}
+              {painting.status === "sold" ? "Sold" : "Reserved"}
             </span>
           )}
         </div>
         <div className="mt-3 flex items-baseline justify-between">
           <h3 className="font-serif text-base">{painting.title}</h3>
-          <span
-            className={
-              isAvailable ? "text-sm" : "text-sm text-neutral-400 line-through"
-            }
-          >
-            {formatPrice(painting.priceUsd)}
-          </span>
+          {painting.status !== "sold" && (
+            <span className="text-sm">{formatPrice(painting.priceUsd)}</span>
+          )}
         </div>
         <p className="text-sm text-ink-muted">{painting.medium}</p>
       </Link>

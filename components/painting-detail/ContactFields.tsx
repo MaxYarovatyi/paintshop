@@ -31,7 +31,7 @@ function Chevron({ open }: { open: boolean }) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M6 916 6 6-6" />
+      <path d="M6 9l6 6 6-6" />
     </svg>
   );
 }
@@ -113,7 +113,7 @@ export default function ContactFields({
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
           placeholder={contactPlaceholder(channel)}
-          inputMode={isPhoneOnly ? "tel" : "text"}
+          inputMode={isPhoneOnly ? "tel" : channel === "email" ? "email" : "text"}
           required
           className="flex-1 min-w-0 bg-transparent py-2 text-sm focus:outline-none"
         />
