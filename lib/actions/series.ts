@@ -97,7 +97,7 @@ export async function deleteSeries(id: string) {
   const supabase = await createClient();
 
   const { count } = await supabase
-    .from("paintings")
+    .from("products")
     .select("id", { count: "exact", head: true })
     .eq("series_id", id);
   if (count && count > 0) throw new Error("This series still has works. Reassign them first.");
