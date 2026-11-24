@@ -26,7 +26,7 @@ export default function ShareButtons({url, title}: {url:string; title:string}) {
 
     return (
         <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-wide text-inl-muted mr-1">Share</span>
+            <span className="text-xs uppercase tracking-wide text-ink-muted mr-1">Share</span>
             <button onClick={handleCopy} className="w-8 h-8 flex items-center justify-center border border-canvas-border text-ink-muted hover:border-ink hover:text-ink transition-colors">
                 {copied ? <CheckIcon className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
             </button>

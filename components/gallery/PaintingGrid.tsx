@@ -20,7 +20,7 @@ export default function PaintingGrid({ paintings }: { paintings: Painting[] }) {
     >
       {paintings.map((p, i) => (
         <div key={p.id} className="break-inside-avoid mb-8">
-          <PaintingCard key={p.id} painting={p} priority={i < 4} />
+          <PaintingCard painting={p} priority={i < 4} />
         </div>
       ))}
     </motion.div>

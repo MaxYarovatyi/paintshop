@@ -4,6 +4,6 @@ export const fadeUp :Variants = {
     visible: {opacity: 1, y: 0, transition: {duration: 0.4, ease: "easeOut"}}
 };
 
-export const staggerChildren = {
+export const staggerChildren: Variants = {
     visible: {transition: {staggerChildren: 0.06}},
 }

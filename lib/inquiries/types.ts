@@ -1,4 +1,3 @@
-import { label } from "motion/react-client";
 
 export interface InquiryIntent {
     paintingId: string;
@@ -12,7 +11,7 @@ export interface InquiryIntent {
 
 export const CONTACT_CHANNELS = [
     {name: "whatsapp", label: "WhatsApp"},
-    {name: "telegram", label: "Telergam"},
+    {name: "telegram", label: "Telegram"},
     {name: "viber", label: "Viber"},
     {name: "instagram", label: "Instagram"}
 ] as const;

@@ -45,7 +45,10 @@ export default function ImageViewer({
           {sorted.map((img, i) => (
             <button
               key={img.id}
+              type="button"
               onClick={() => setActiveIndex(i)}
+              aria-label={`Show image ${i + 1}`}
+              aria-current={i === activeIndex}
               className={`relative w-16 md:w-20 aspect-[4/5] overflow-hidden border shrink-0 ${
                 i === activeIndex
                   ? "border-ink"
@@ -65,6 +68,7 @@ export default function ImageViewer({
       )}
 
       <button
+        type="button"
         onClick={() => setLightboxOpen(true)}
         style={{"--ratio": ratio} as React.CSSProperties}
         className="painting-frame order-1 md:order-2 bg-canvas-muted relative overflow-hidden block cursor-zoom-in"

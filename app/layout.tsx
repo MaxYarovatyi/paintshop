@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces, Newsreader, Instrument_Sans} from "next/font/google";
+import { Newsreader, Instrument_Sans} from "next/font/google";
 import "./globals.css";
 import "flag-icons/css/flag-icons.min.css";
 
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${sans.variable} ${serif.variable} h-full antialiased`}
     >
-      <body className="bg-canvas textink antialiased">{children}</body>
+      <body className="bg-canvas text-ink antialiased">{children}</body>
     </html>
   );
 }
