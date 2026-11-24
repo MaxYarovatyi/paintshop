@@ -38,7 +38,7 @@ export default function PaintingCard({
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={priority}
-              className="object-contain group-hover:scale-[1.02] transition-transform duration-300"
+              className="object-contain group-hover:opacity-90 transition-opacity duration-300"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-neutral-400 text-sm">

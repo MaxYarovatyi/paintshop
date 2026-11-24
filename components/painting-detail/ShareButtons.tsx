@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { CheckIcon, FacebookIcon, LinkIcon, TelegramIcon, XIcon } from "../icons/ShareIcons";
+import { CheckIcon, LinkIcon, TelegramIcon } from "../icons/ShareIcons";
 
 export default function ShareButtons({url, title}: {url:string; title:string}) {
     const [copied, setCopied] = useState(false);
@@ -19,15 +19,13 @@ export default function ShareButtons({url, title}: {url:string; title:string}) {
     const encodedTitle = encodeURIComponent(title);
 
     const links = [
-        {label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, Icon: FacebookIcon},
         {label: "Telegram", href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`, Icon: TelegramIcon},
-        {label: "X", href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`, Icon: XIcon}
     ];
 
     return (
         <div className="flex items-center gap-2">
             <span className="text-xs uppercase tracking-wide text-ink-muted mr-1">Share</span>
-            <button onClick={handleCopy} className="w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center border border-canvas-border text-ink-muted hover:border-ink hover:text-ink transition-colors">
+            <button onClick={handleCopy} aria-label="Copy link" className="w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center border border-canvas-border text-ink-muted hover:border-ink hover:text-ink transition-colors">
                 {copied ? <CheckIcon className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
             </button>
             {links.map(({label, href, Icon})=> (
