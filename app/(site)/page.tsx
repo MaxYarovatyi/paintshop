@@ -1,6 +1,5 @@
 import PaintingGrid from "@/components/gallery/PaintingGrid";
 import ArtistStatement from "@/components/home/ArtistStatement";
-import StatsRow from "@/components/home/StatsRow";
 import PageContainer from "@/components/layout/PageContainer";
 import Section from "@/components/layout/Section";
 import { getPublicPaintings } from "@/lib/supabase/publicQueries";
@@ -33,10 +32,6 @@ export default async function HomePage() {
 
         <Section muted>
             <ArtistStatement />
-        </Section>
-
-        <Section>
-            <StatsRow />
         </Section>
         </>
     );
