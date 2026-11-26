@@ -11,6 +11,8 @@ import { sendTelegramNotification, escapeHtml } from "../notifications/telegram"
 import { CONTACT_CHANNELS } from "../inquiries/types";
 import { inquirySchema, fieldErrors } from "../inquiries/schema";
 import { SITE_URL } from "../brand";
+import { getInquiryAttribution } from "../attribution/server";
+import { formatSource } from "../attribution/attribution";
 
 const statusSchema = z.enum(INQUIRY_STATUSES);
 
@@ -73,6 +75,9 @@ export async function submitInquiry(input: unknown): Promise<SubmitResult> {
             return { ok: false, error: "This work is not available for inquiries." };
         }
 
+        // Read from the server-set cookie and headers only, never from the form.
+        const attribution = await getInquiryAttribution();
+
         const { error } = await supabase.from("inquiries").insert({
             product_id: product.id,
             type: "purchase",
@@ -83,10 +88,17 @@ export async function submitInquiry(input: unknown): Promise<SubmitResult> {
             status: "new",
             preferred_channel: channel,
             ip_hash: ipHash,
+            source: attribution.source,
+            utm: attribution.utm,
+            referrer: attribution.referrer,
+            landing_path: attribution.landingPath,
         });
         if (error) throw new Error(error.message);
 
-        await notifyNewInquiry({ title: product.title, name, contact, country, channel, message });
+        await notifyNewInquiry({
+            title: product.title, name, contact, country, channel, message,
+            source: formatSource(attribution.source, attribution.medium),
+        });
         return { ok: true };
     } catch (err) {
         console.error("submitInquiry error:", err instanceof Error ? err.message : err);
@@ -96,15 +108,17 @@ export async function submitInquiry(input: unknown): Promise<SubmitResult> {
 
 async function notifyNewInquiry(i: {
     title: string; name: string; contact: string; country: string; channel: string; message?: string;
+    source: string;
 }) {
-    const { title, name, contact, country, channel, message } = i;
+    const { title, name, contact, country, channel, message, source } = i;
     const channelLabel = CONTACT_CHANNELS.find((c) => c.name === channel)?.label ?? channel;
     await sendTelegramNotification(
         `<b>New inquiry</b>\n"${escapeHtml(title)}"\n\n` +
         `Name: ${escapeHtml(name)}\n` +
         `Contact: ${escapeHtml(contact)}\n` +
         `Country: ${escapeHtml(country)}\n` +
-        `Prefers: ${escapeHtml(channelLabel)}` +
+        `Prefers: ${escapeHtml(channelLabel)}\n` +
+        `Source: ${escapeHtml(source)}` +
         (message ? `\nMessage: ${escapeHtml(message)}` : "") +
         `\n\n<a href="${escapeHtml(SITE_URL + "/admin/inquiries")}">Open inquiries</a>`
     );

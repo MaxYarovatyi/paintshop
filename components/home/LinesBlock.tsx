@@ -24,7 +24,9 @@ export default function LinesBlock({ fallbackPaintingPath }: { fallbackPaintingP
                       className="object-contain"
                     />
                   ) : (
-                    <div aria-hidden className="h-full w-full border border-canvas-border" />
+                    <div className="flex h-full min-h-[12rem] w-full items-center justify-center border border-canvas-border text-sm text-ink-muted">
+                      Coming soon
+                    </div>
                   )}
                 </div>
                 <h2 className="mb-2 font-serif text-xl text-ink">{line.title}</h2>
