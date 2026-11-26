@@ -14,4 +14,16 @@ export interface Inquiry
     createdAt: string; 
     preferredChannel: string;
     painting?: {title: string; slug: string};
+    source: string;
+    utm: InquiryUtm | null;
+}
+
+/** Stored in inquiries.utm by the public inquiry action. */
+export interface InquiryUtm {
+    source?: string | null;
+    medium?: string | null;
+    campaign?: string | null;
+    landing_path?: string | null;
+    referrer_host?: string | null;
+    first_seen_at?: string | null;
 }

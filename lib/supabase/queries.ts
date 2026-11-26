@@ -1,7 +1,7 @@
 import { createClient } from "./server";
 import type { Painting } from "../types/painting";
 import { mapPainting, mapSeries, type PaintingRow, type SeriesRow } from "./mappers";
-import { Inquiry } from "../types/inquiry";
+import type { Inquiry, InquiryUtm } from "../types/inquiry";
 import type { Series } from "../types/series";
 
 interface InquiryRow {
@@ -15,6 +15,8 @@ interface InquiryRow {
   preferred_channel: string;
   created_at: string;
   products: { title: string; slug: string } | null;
+  source: string | null;
+  utm: InquiryUtm | null;
 }
 
 export async function getAllSeries(): Promise<Series[]> {
@@ -52,7 +54,9 @@ function mapInquiry(row: InquiryRow) {
     status: row.status as Inquiry["status"],
     preferredChannel: row.preferred_channel,
     createdAt: row.created_at,
-    painting: row.products ?? undefined
+    painting: row.products ?? undefined,
+    source: row.source || "site",
+    utm: row.utm && typeof row.utm === "object" ? row.utm : null,
   }
 }
 
